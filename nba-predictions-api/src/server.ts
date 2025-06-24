@@ -12,6 +12,8 @@ import { requestLogger } from '@/middleware/requestLogger';
 import { healthRoutes } from '@/routes/health';
 import { predictionRoutes } from '@/routes/predictions';
 import { swaggerOptions } from '@/config/swagger';
+import { database } from '@/config/database';
+import { initializeDatabase } from '@/config/initDatabase';
 
 dotenv.config();
 
@@ -103,11 +105,38 @@ app.use('*', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  const corsOrigins = getCorsOrigins();
-  logger.info(`🚀 NBA Predictions API running on port ${PORT}`);
-  logger.info(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  logger.info(`🔒 CORS: ${corsOrigins === true ? 'Allow all localhost' : `Origins: ${Array.isArray(corsOrigins) ? corsOrigins.join(', ') : corsOrigins}`}`);
-  logger.info(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
-  logger.info(`🏥 Health Check: http://localhost:${PORT}/api/${apiVersion}/health`);
+async function startServer(): Promise<void> {
+  try {
+    // Initialize database
+    await database.connect();
+    await initializeDatabase();
+    
+    app.listen(PORT, () => {
+      const corsOrigins = getCorsOrigins();
+      logger.info(`🚀 NBA Predictions API running on port ${PORT}`);
+      logger.info(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+      logger.info(`🔒 CORS: ${corsOrigins === true ? 'Allow all localhost' : `Origins: ${Array.isArray(corsOrigins) ? corsOrigins.join(', ') : corsOrigins}`}`);
+      logger.info(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
+      logger.info(`🏥 Health Check: http://localhost:${PORT}/api/${apiVersion}/health`);
+    });
+    
+  } catch (error) {
+    logger.error('Failed to start server', { error: (error as Error).message });
+    process.exit(1);
+  }
+}
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+  await database.close();
+  process.exit(0);
 });
+
+process.on('SIGINT', async () => {
+  logger.info('SIGINT received, shutting down gracefully');
+  await database.close();
+  process.exit(0);
+});
+
+startServer();
