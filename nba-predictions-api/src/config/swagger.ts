@@ -45,18 +45,13 @@ export const swaggerOptions: Options = {
               description: 'Team name',
               example: 'Los Angeles Lakers'
             },
-            city: {
-              type: 'string',
-              description: 'Team city',
-              example: 'Los Angeles'
-            },
             conference: {
               type: 'string',
               enum: ['East', 'West'],
               description: 'Team conference'
             }
           },
-          required: ['id', 'abbreviation', 'name', 'city', 'conference']
+          required: ['id', 'abbreviation', 'name', 'conference']
         },
         GamePrediction: {
           type: 'object',

@@ -2,7 +2,6 @@ export interface Team {
   id: string;
   abbreviation: string;
   name: string;
-  city: string;
   conference: 'East' | 'West';
 }
 

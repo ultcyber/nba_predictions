@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS teams (
   id TEXT PRIMARY KEY,
   abbreviation TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
-  city TEXT NOT NULL,
   conference TEXT NOT NULL CHECK (conference IN ('East', 'West'))
 );
 

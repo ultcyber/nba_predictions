@@ -47,12 +47,10 @@ export class GameService {
           ht.id as home_team_id,
           ht.abbreviation as home_team_abbreviation,
           ht.name as home_team_name,
-          ht.city as home_team_city,
           ht.conference as home_team_conference,
           at.id as away_team_id,
           at.abbreviation as away_team_abbreviation,
           at.name as away_team_name,
-          at.city as away_team_city,
           at.conference as away_team_conference
         FROM games g
         LEFT JOIN teams ht ON g.home_team_id = ht.id
@@ -103,12 +101,10 @@ export class GameService {
           ht.id as home_team_id,
           ht.abbreviation as home_team_abbreviation,
           ht.name as home_team_name,
-          ht.city as home_team_city,
           ht.conference as home_team_conference,
           at.id as away_team_id,
           at.abbreviation as away_team_abbreviation,
           at.name as away_team_name,
-          at.city as away_team_city,
           at.conference as away_team_conference
         FROM games g
         LEFT JOIN teams ht ON g.home_team_id = ht.id
@@ -148,14 +144,12 @@ export class GameService {
         id: r.home_team_id as string,
         abbreviation: r.home_team_abbreviation as string,
         name: r.home_team_name as string,
-        city: r.home_team_city as string,
         conference: r.home_team_conference as 'East' | 'West'
       },
       away_team: {
         id: r.away_team_id as string,
         abbreviation: r.away_team_abbreviation as string,
         name: r.away_team_name as string,
-        city: r.away_team_city as string,
         conference: r.away_team_conference as 'East' | 'West'
       },
       prediction: {
