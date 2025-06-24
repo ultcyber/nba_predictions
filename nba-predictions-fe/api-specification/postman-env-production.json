@@ -1,0 +1,44 @@
+{
+	"id": "nba-predictions-production",
+	"name": "NBA Predictions - Production",
+	"values": [
+		{
+			"key": "baseUrl",
+			"value": "https://api.nba-predictions.com/api/v1",
+			"description": "Production server",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "apiVersion",
+			"value": "v1",
+			"description": "API version",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "sampleGameId",
+			"value": "0022400741",
+			"description": "Sample game ID for testing",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "sampleTeam",
+			"value": "DAL",
+			"description": "Sample team abbreviation for testing",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "sampleDate",
+			"value": "2025-02-08",
+			"description": "Sample date for testing (YYYY-MM-DD)",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2025-02-08T15:30:00.000Z",
+	"_postman_exported_using": "Postman/10.0.0"
+}
