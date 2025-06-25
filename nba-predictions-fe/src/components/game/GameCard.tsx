@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Game } from '../../types/api';
 import ProbabilityBadge from './ProbabilityBadge';
+import TeamLogo from '../ui/TeamLogo';
 
 interface GameCardProps {
   game: Game;
@@ -22,12 +23,14 @@ const GameCard: React.FC<GameCardProps> = ({ game, variant = 'default' }) => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow duration-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
+            <TeamLogo team={game.away_team} size="small" />
             <div className="text-sm">
               <div className="font-medium text-gray-900">
-                {game.away_team.abbreviation} @ {game.home_team.abbreviation}
+                {game.away_team.name} @ {game.home_team.name}
               </div>
               <div className="text-gray-500">{formatGameTime(game.date)}</div>
             </div>
+            <TeamLogo team={game.home_team} size="small" />
           </div>
           <div className="text-right">
             <div className="text-lg font-bold text-gray-900">{game.prediction.rating}</div>
@@ -53,15 +56,12 @@ const GameCard: React.FC<GameCardProps> = ({ game, variant = 'default' }) => {
         <div className="flex items-center justify-between mb-4">
           {/* Away Team */}
           <div className="flex-1 text-center">
-            <div className="w-12 h-12 bg-gray-100 rounded-full mx-auto mb-2 flex items-center justify-center">
-              <span className="text-sm font-bold text-gray-700">
-                {game.away_team.abbreviation}
-              </span>
+            <div className="mb-2">
+              <TeamLogo team={game.away_team} size="medium" />
             </div>
             <div className="text-sm font-semibold text-gray-900 leading-tight">
               {game.away_team.name}
             </div>
-            <div className="text-xs text-gray-500 mt-1">{game.away_team.conference}</div>
           </div>
 
           {/* VS Separator */}
@@ -73,15 +73,12 @@ const GameCard: React.FC<GameCardProps> = ({ game, variant = 'default' }) => {
 
           {/* Home Team */}
           <div className="flex-1 text-center">
-            <div className="w-12 h-12 bg-gray-100 rounded-full mx-auto mb-2 flex items-center justify-center">
-              <span className="text-sm font-bold text-gray-700">
-                {game.home_team.abbreviation}
-              </span>
+            <div className="mb-2">
+              <TeamLogo team={game.home_team} size="medium" />
             </div>
             <div className="text-sm font-semibold text-gray-900 leading-tight">
               {game.home_team.name}
             </div>
-            <div className="text-xs text-gray-500 mt-1">{game.home_team.conference}</div>
           </div>
         </div>
       </div>
