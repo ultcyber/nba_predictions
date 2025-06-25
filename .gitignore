@@ -13,6 +13,8 @@ dist/
 downloads/
 eggs/
 .eggs/
+logs/
+data/
 lib/
 lib64/
 parts/
@@ -85,3 +87,8 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude AI files
+.claude
+.claude/
+*.claude
