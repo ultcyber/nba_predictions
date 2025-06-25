@@ -1,3 +1,103 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-nba-blue: #1d428a;
+  --color-nba-red: #c8102e;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+  --color-green-100: #dcfce7;
+  --color-green-400: #4ade80;
+  --color-green-600: #16a34a;
+  --color-green-800: #166534;
+  --color-red-100: #fee2e2;
+  --color-red-400: #f87171;
+  --color-red-600: #dc2626;
+  --color-red-800: #991b1b;
+  --color-yellow-400: #facc15;
+  --color-yellow-600: #ca8a04;
+}
+
+/* React DatePicker Custom Styles */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  width: 100%;
+}
+
+.react-datepicker-popper {
+  z-index: 50;
+}
+
+.react-datepicker {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  font-family: system-ui, sans-serif;
+}
+
+.react-datepicker__header {
+  background-color: #1d428a;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  padding: 8px 0;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  color: white;
+  font-weight: 600;
+}
+
+.react-datepicker__navigation {
+  top: 12px;
+}
+
+.react-datepicker__navigation--previous {
+  border-right-color: white;
+}
+
+.react-datepicker__navigation--next {
+  border-left-color: white;
+}
+
+.react-datepicker__month-container {
+  padding: 8px;
+}
+
+.react-datepicker__day {
+  border-radius: 4px;
+  margin: 2px;
+  padding: 4px;
+  transition: all 0.2s ease;
+}
+
+.react-datepicker__day:hover {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.react-datepicker__day--selected {
+  background-color: #1d428a !important;
+  color: white !important;
+}
+
+.react-datepicker__day--selected:hover {
+  background-color: #1e40af !important;
+}
+
+.react-datepicker__day--today {
+  background-color: #fef3c7;
+  color: #92400e;
+  font-weight: 600;
+}
+
+.react-datepicker__day--outside-month {
+  color: #9ca3af;
+}
+
+.react-datepicker__day--disabled {
+  color: #d1d5db;
+  cursor: not-allowed;
+}

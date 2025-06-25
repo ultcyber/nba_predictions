@@ -23,9 +23,6 @@ const Home: React.FC = () => {
   return (
     <div>
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          NBA Game Predictions
-        </h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
           AI-powered predictions for NBA games with detailed probability analysis
           and confidence ratings.

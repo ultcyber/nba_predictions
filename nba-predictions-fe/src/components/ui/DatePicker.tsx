@@ -1,5 +1,6 @@
 import React from 'react';
 import DatePickerComponent from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 interface DatePickerProps {
   selectedDate: Date;
