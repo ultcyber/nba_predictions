@@ -10,11 +10,11 @@ interface GameListProps {
 }
 
 const GameListSkeleton: React.FC = () => (
-  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+  <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
     {[...Array(6)].map((_, i) => (
       <div key={i} className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
         <div className="bg-gray-200 animate-pulse h-16"></div>
-        <div className="p-6 space-y-4">
+        <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
               <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
@@ -27,7 +27,7 @@ const GameListSkeleton: React.FC = () => (
             </div>
           </div>
         </div>
-        <div className="border-t border-gray-100 p-6 bg-gray-50">
+        <div className="border-t border-gray-100 p-4 sm:p-6 bg-gray-50">
           <div className="space-y-3">
             <div className="w-16 h-6 bg-gray-200 rounded-full mx-auto animate-pulse"></div>
             <div className="w-24 h-8 bg-gray-200 rounded mx-auto animate-pulse"></div>
@@ -94,8 +94,8 @@ const GameList: React.FC<GameListProps> = ({ games, isLoading, error, variant = 
   }
 
   const gridClasses = variant === 'compact' 
-    ? 'space-y-3' 
-    : 'grid gap-6 md:grid-cols-2 lg:grid-cols-3';
+    ? 'space-y-2 sm:space-y-3' 
+    : 'grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
 
   return (
     <div className={gridClasses}>

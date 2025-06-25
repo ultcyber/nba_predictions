@@ -52,11 +52,11 @@ const TeamLogo: React.FC<TeamLogoProps> = ({ team, size = 'medium', variant = 'c
   const getSizeClasses = () => {
     switch (size) {
       case 'small':
-        return 'w-8 h-8 text-xs';
+        return 'w-6 h-6 sm:w-8 sm:h-8 text-xs min-w-[24px] min-h-[24px]';
       case 'large':
-        return 'w-16 h-16 text-lg';
+        return 'w-14 h-14 sm:w-16 sm:h-16 text-base sm:text-lg min-w-[56px] min-h-[56px]';
       default:
-        return 'w-12 h-12 text-sm';
+        return 'w-10 h-10 sm:w-12 sm:h-12 text-xs sm:text-sm min-w-[40px] min-h-[40px]';
     }
   };
 
@@ -86,8 +86,6 @@ const TeamLogo: React.FC<TeamLogoProps> = ({ team, size = 'medium', variant = 'c
           font-bold
           shadow-lg
           ring-2 ${colors.accent} ring-opacity-50
-          transition-all duration-200
-          hover:scale-110 hover:shadow-xl
           relative
           overflow-hidden
         `}
@@ -105,7 +103,7 @@ const TeamLogo: React.FC<TeamLogoProps> = ({ team, size = 'medium', variant = 'c
 
       {/* Conference Badge */}
       {size !== 'small' && (
-        <div className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+        <div className={`text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full ${
           team.conference === 'East' 
             ? 'bg-blue-100 text-blue-800' 
             : 'bg-red-100 text-red-800'
