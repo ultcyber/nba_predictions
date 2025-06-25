@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
+import 'dotenv/config'
 import swaggerUi from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
 
@@ -12,7 +12,6 @@ import { healthRoutes } from '@/routes/health';
 import { predictionRoutes } from '@/routes/predictions';
 import { swaggerOptions } from '@/config/swagger';
 
-dotenv.config();
 
 const app = express();
 

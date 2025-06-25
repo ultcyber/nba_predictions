@@ -34,8 +34,8 @@ export async function initializeDatabase(): Promise<void> {
 async function addSampleData(): Promise<void> {
   try {
     // Check if data already exists
-    const existingGames = await database.get('SELECT COUNT(*) as count FROM games');
-    if (existingGames && (existingGames as any).count > 0) {
+    const existingGamesCount = await database.get<{count: number}>('SELECT COUNT(*) as count FROM games');
+    if (existingGamesCount && existingGamesCount.count > 0 ) {
       logger.info('Sample data already exists, skipping initialization');
       return;
     }

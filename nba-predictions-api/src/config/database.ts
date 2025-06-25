@@ -4,6 +4,9 @@ import fs from 'fs';
 import { logger } from '@/utils/logger';
 
 const dbPath = process.env.DB_PATH || './data/nba_predictions.db';
+if (!process.env.DB_PATH) {
+  logger.warn("DB_PATH variable not defined. Using default './data/nba_predictions.db'")
+}
 const dbDir = path.dirname(dbPath);
 
 // Ensure database directory exists
