@@ -36,7 +36,7 @@ const router = Router();
  *                       type: string
  *                       enum: [connected, disconnected]
  */
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (_req: Request, res: Response) => {
   try {
     // Check database connection
     let databaseStatus = 'disconnected';

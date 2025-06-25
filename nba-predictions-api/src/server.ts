@@ -75,7 +75,7 @@ app.use(`/api/${apiVersion}/health`, healthRoutes);
 app.use(`/api/${apiVersion}/predictions`, predictionRoutes);
 
 // Root endpoint
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.json({
     success: true,
     data: {

@@ -3,7 +3,7 @@ import Joi from 'joi';
 import { ApiError } from './errorHandler';
 
 export const validateQuery = (schema: Joi.ObjectSchema) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     const { error, value } = schema.validate(req.query);
     
     if (error) {
@@ -26,7 +26,7 @@ export const validateQuery = (schema: Joi.ObjectSchema) => {
 };
 
 export const validateParams = (schema: Joi.ObjectSchema) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     const { error, value } = schema.validate(req.params);
     
     if (error) {

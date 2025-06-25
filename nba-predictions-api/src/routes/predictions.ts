@@ -64,7 +64,7 @@ const gameService = new GameService();
  */
 router.get('/', validateQuery(predictionsQuerySchema), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { date, team, limit, offset } = req.query as {
+    const { date, team, limit, offset } = req.query as unknown as {
       date?: string;
       team?: string;
       limit: number;

@@ -29,8 +29,8 @@ export interface PaginationParams {
 }
 
 export interface GameFilters {
-  date?: string;
-  team?: string;
+  date?: string | undefined;
+  team?: string | undefined;
 }
 
 export interface PaginatedResponse<T> {

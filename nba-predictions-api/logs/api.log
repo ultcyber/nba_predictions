@@ -1,0 +1,12 @@
+{"level":"info","message":"Connected to SQLite database","path":"./data/nba_predictions.db","service":"nba-predictions-api","timestamp":"2025-06-24 23:38:47"}
+{"level":"info","message":"Database schema initialized successfully","service":"nba-predictions-api","timestamp":"2025-06-24 23:38:47"}
+{"level":"info","message":"Database connection closed","service":"nba-predictions-api","timestamp":"2025-06-24 23:38:48"}
+{"level":"info","message":"Connected to SQLite database","path":"./data/nba_predictions.db","service":"nba-predictions-api","timestamp":"2025-06-24 23:41:58"}
+{"level":"info","message":"Database schema initialized successfully","service":"nba-predictions-api","timestamp":"2025-06-24 23:41:58"}
+{"level":"info","message":"Database connection closed","service":"nba-predictions-api","timestamp":"2025-06-24 23:42:00"}
+{"level":"info","message":"Connected to SQLite database","path":"./data/nba_predictions.db","service":"nba-predictions-api","timestamp":"2025-06-25 10:55:43"}
+{"level":"info","message":"Database schema initialized successfully","service":"nba-predictions-api","timestamp":"2025-06-25 10:55:43"}
+{"level":"info","message":"Database connection closed","service":"nba-predictions-api","timestamp":"2025-06-25 10:55:54"}
+{"level":"info","message":"Connected to SQLite database","path":"./data/nba_predictions.db","service":"nba-predictions-api","timestamp":"2025-06-25 10:58:25"}
+{"level":"info","message":"Database schema initialized successfully","service":"nba-predictions-api","timestamp":"2025-06-25 10:58:25"}
+{"level":"info","message":"Database connection closed","service":"nba-predictions-api","timestamp":"2025-06-25 10:58:27"}
