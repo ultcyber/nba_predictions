@@ -12,16 +12,19 @@ if (!fs.existsSync(dbDir)) {
 }
 
 class Database {
-  private db: sqlite3.Database | null = null;
+  private db: sqlite3.Database | undefined;
+  private isConnected: boolean = false;
 
   async connect(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db = new sqlite3.Database(dbPath, (err) => {
         if (err) {
           logger.error('Database connection failed', { error: err.message });
+          this.isConnected = false;
           reject(err);
         } else {
           logger.info('Connected to SQLite database', { path: dbPath });
+          this.isConnected = true;
           resolve();
         }
       });
@@ -30,13 +33,15 @@ class Database {
 
   async close(): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (this.db) {
+      if (this.db && this.isConnected) {
         this.db.close((err) => {
           if (err) {
             logger.error('Database close failed', { error: err.message });
             reject(err);
           } else {
             logger.info('Database connection closed');
+            this.db = undefined;
+            this.isConnected = false;
             resolve();
           }
         });
