@@ -9,7 +9,10 @@ async function startServer(): Promise<void> {
   try {
     // Initialize database
     await database.connect();
-    await initializeDatabase();
+    if (process.env.NODE_ENV === 'development') {
+      logger.info('Development environment - intializing database sample data');
+      await initializeDatabase();
+    }
     
     app.listen(PORT, () => {
       logger.info(`🚀 NBA Predictions API running on port ${PORT}`);

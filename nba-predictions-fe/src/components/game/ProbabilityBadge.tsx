@@ -76,7 +76,12 @@ const ProbabilityBadge: React.FC<ProbabilityBadgeProps> = ({ prediction, size = 
       {/* Probability Bar */}
       <div className="w-full bg-gray-200 rounded-full h-2">
         <div 
-          className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-300"
+          className={`h-2 rounded-full transition-all duration-300 ${
+            prediction.confidence === 'high' 
+              ? 'bg-gradient-to-r from-green-400 to-green-600'
+              : prediction.confidence === 'medium' ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
+              'bg-gradient-to-r from-red-400 to-red-600'
+          }`}
           style={{ width: `${prediction.probability.good * 100}%` }}
         />
       </div>
