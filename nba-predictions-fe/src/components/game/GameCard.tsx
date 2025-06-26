@@ -59,8 +59,8 @@ const GameCard: React.FC<GameCardProps> = ({ game, variant = 'default' }) => {
             <div className="mb-2">
               <TeamLogo team={game.away_team} size="medium" />
             </div>
-            <div className="text-xs sm:text-sm font-semibold text-gray-900 leading-tight">
-              {game.away_team.name}
+            <div className="text-xs sm:text-sm font-semibold text-gray-900 leading-tight h-8 flex items-center justify-center">
+              <span className="text-center break-words">{game.away_team.name}</span>
             </div>
           </div>
 
@@ -76,8 +76,8 @@ const GameCard: React.FC<GameCardProps> = ({ game, variant = 'default' }) => {
             <div className="mb-2">
               <TeamLogo team={game.home_team} size="medium" />
             </div>
-            <div className="text-xs sm:text-sm font-semibold text-gray-900 leading-tight">
-              {game.home_team.name}
+            <div className="text-xs sm:text-sm font-semibold text-gray-900 leading-tight h-8 flex items-center justify-center">
+              <span className="text-center break-words">{game.home_team.name}</span>
             </div>
           </div>
         </div>
