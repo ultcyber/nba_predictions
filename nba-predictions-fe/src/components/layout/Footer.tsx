@@ -7,7 +7,10 @@ const Footer: React.FC = () => {
   return (
     <footer className="bg-gray-800 text-white mt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex justify-end items-center">
+        <div className="text-center space-y-3">
+          <p className="text-gray-400 text-xs leading-relaxed max-w-4xl mx-auto font-light">
+            The National Basketball Association ("NBA") and the names of the NBA teams are trademarks that are property of NBA Properties, Inc. and the member teams of the NBA. These trademark holders are not affiliated with, nor do they sponsor or endorse this site.
+          </p>
           <div className="text-sm">
             API Status: {' '}
             {isLoading ? (
