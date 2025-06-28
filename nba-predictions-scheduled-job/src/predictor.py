@@ -80,13 +80,13 @@ class GamePredictor:
             # Get prediction rating
             rating_array = self.model.predict(features_df)
             
-            # Extract scalar value from numpy array
+            # Extract scalar value from numpy array and round to 2 decimal places
             if hasattr(rating_array, 'item'):
-                rating = float(rating_array.item())
+                rating = round(float(rating_array.item()), 2)
             elif hasattr(rating_array, '__getitem__') and len(rating_array) > 0:
-                rating = float(rating_array[0])
+                rating = round(float(rating_array[0]), 2)
             else:
-                rating = float(rating_array)
+                rating = round(float(rating_array), 2)
             
             prediction = {
                 "rating": rating,
