@@ -2,6 +2,10 @@
 
 Automated system for collecting NBA game data, generating predictions using a trained XGBoost model, and storing results in the database.
 
+## Requirements
+
+- Python 3.13 or higher
+
 ## Setup
 
 1. Install dependencies:
