@@ -65,7 +65,8 @@ class NBAScheduler:
             logger.info("All components initialized successfully")
             
         except Exception as e:
-            raise NBASchedulerError(f"Failed to initialize components") from e
+            logger.error(f"Component initialization error: {e}")
+            raise NBASchedulerError(f"Failed to initialize components: {e}") from e
     
     def run_predictions(
         self, 
@@ -211,7 +212,7 @@ class NBAScheduler:
                 
                 # Generate prediction
                 prediction = self.predictor.predict_game_quality(features_df)
-                logger.debug(f"Generated prediction for game {game_id}: {prediction['classification']} ({prediction['rating']}/100)")
+                logger.debug(f"Generated prediction for game {game_id}: {prediction['rating']}/100")
                 
                 # Create complete prediction record
                 prediction_record = self.predictor.create_full_prediction(game, features, prediction)
@@ -221,7 +222,7 @@ class NBAScheduler:
                 
                 if success:
                     self.stats["games_saved"] += 1
-                    logger.info(f"Saved prediction for game {game_id}: {prediction['classification']} - {prediction['rating']}/100 ({prediction['confidence']} confidence)")
+                    logger.info(f"Saved prediction for game {game_id}: {prediction['rating']}/100")
                 else:
                     logger.warning(f"Failed to save prediction for game {game_id}")
                 

@@ -129,14 +129,18 @@ class NBADataCollector:
             game_summary = dataframes[0].iloc[0]
             other_stats = dataframes[1].iloc[0]
             
+            # Log available columns for debugging
+            logger.debug(f"Game summary columns: {list(game_summary.index)}")
+            logger.debug(f"Other stats columns: {list(other_stats.index)}")
+            
             # Extract relevant information
             game_details = {
                 'game_id': game_id,
-                'home_team_score': int(game_summary['HOME_TEAM_PTS']),
-                'away_team_score': int(game_summary['VISITOR_TEAM_PTS']),
-                'lead_changes': int(other_stats['LEAD_CHANGES']),
-                'times_tied': int(other_stats['TIMES_TIED']),
-                'game_status': game_summary['GAME_STATUS_TEXT'],
+                'home_team_score': int(game_summary.get('HOME_TEAM_PTS', game_summary.get('PTS_HOME', 0))),
+                'away_team_score': int(game_summary.get('VISITOR_TEAM_PTS', game_summary.get('PTS_AWAY', 0))),
+                'lead_changes': int(other_stats.get('LEAD_CHANGES', 0)),
+                'times_tied': int(other_stats.get('TIMES_TIED', 0)),
+                'game_status': game_summary.get('GAME_STATUS_TEXT', 'Final'),
                 'attendance': game_summary.get('ATTENDANCE', 0)
             }
             
@@ -252,15 +256,18 @@ class NBADataCollector:
             
             standings_df = standings.get_data_frames()[0]
             
+            # Log available columns for debugging
+            logger.debug(f"Standings columns: {list(standings_df.columns)}")
+            
             team_standings = {}
             for _, team in standings_df.iterrows():
                 team_standings[team['TeamID']] = {
-                    'conference_rank': team['ConferenceRank'],
-                    'league_rank': team['LeagueRank'],
-                    'wins': team['WINS'],
-                    'losses': team['LOSSES'],
-                    'win_pct': team['WinPCT'],
-                    'conference': team['Conference']
+                    'conference_rank': team.get('ConferenceRank', team.get('CONFERENCE_RANK', 1)),
+                    'league_rank': team.get('LeagueRank', team.get('LEAGUE_RANK', 1)),
+                    'wins': team.get('WINS', team.get('W', 0)),
+                    'losses': team.get('LOSSES', team.get('L', 0)),
+                    'win_pct': team.get('WinPCT', team.get('W_PCT', 0.5)),
+                    'conference': team.get('Conference', team.get('CONFERENCE', 'Unknown'))
                 }
             
             return team_standings

@@ -1,6 +1,10 @@
 # Ignore ML model directory
 nba-predictions-model/
 
+# Backups
+backups/
+nba-predictions-scheduled-job/backups/
+
 # Python
 __pycache__/
 *.py[cod]
