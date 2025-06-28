@@ -2,7 +2,7 @@
 
 import argparse
 import sys
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import List, Dict, Any, Optional
 
 from .data_collector import NBADataCollector
@@ -82,7 +82,7 @@ class NBAScheduler:
         Returns:
             Dictionary with execution results and statistics
         """
-        self.stats["start_time"] = datetime.utcnow()
+        self.stats["start_time"] = datetime.now(timezone.utc)
         
         try:
             # Determine target date
@@ -246,7 +246,7 @@ class NBAScheduler:
         Returns:
             Complete statistics dictionary
         """
-        self.stats["end_time"] = datetime.utcnow()
+        self.stats["end_time"] = datetime.now(timezone.utc)
         self.stats["success"] = success
         
         if self.stats["start_time"]:
