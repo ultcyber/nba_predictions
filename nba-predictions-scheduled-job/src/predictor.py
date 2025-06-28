@@ -77,8 +77,16 @@ class GamePredictor:
         try:
             logger.debug("Generating prediction with XGBoost model")
             
-            # Get prediction probabilities
-            rating = self.model.predict(features_df)
+            # Get prediction rating
+            rating_array = self.model.predict(features_df)
+            
+            # Extract scalar value from numpy array
+            if hasattr(rating_array, 'item'):
+                rating = float(rating_array.item())
+            elif hasattr(rating_array, '__getitem__') and len(rating_array) > 0:
+                rating = float(rating_array[0])
+            else:
+                rating = float(rating_array)
             
             prediction = {
                 "rating": rating,
