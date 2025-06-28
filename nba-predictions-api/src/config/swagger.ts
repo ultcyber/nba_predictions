@@ -58,41 +58,18 @@ export const swaggerOptions: Options = {
           properties: {
             rating: {
               type: 'number',
-              description: 'Predicted game rating score',
+              description: 'Predicted game rating score (0-100 scale)',
+              minimum: 0,
+              maximum: 100,
               example: 65.5
             },
             classification: {
               type: 'string',
               enum: ['good', 'bad'],
-              description: 'Game classification based on rating threshold'
-            },
-            probability: {
-              type: 'object',
-              properties: {
-                good: {
-                  type: 'number',
-                  minimum: 0,
-                  maximum: 1,
-                  description: 'Probability of being a good game',
-                  example: 0.73
-                },
-                bad: {
-                  type: 'number',
-                  minimum: 0,
-                  maximum: 1,
-                  description: 'Probability of being a bad game',
-                  example: 0.27
-                }
-              },
-              required: ['good', 'bad']
-            },
-            confidence: {
-              type: 'string',
-              enum: ['high', 'medium', 'low'],
-              description: 'Confidence level of the prediction'
+              description: 'Game classification based on configurable rating threshold'
             }
           },
-          required: ['rating', 'classification', 'probability', 'confidence']
+          required: ['rating', 'classification']
         },
         Game: {
           type: 'object',

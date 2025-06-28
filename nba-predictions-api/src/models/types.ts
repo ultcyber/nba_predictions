@@ -8,11 +8,6 @@ export interface Team {
 export interface GamePrediction {
   rating: number;
   classification: 'good' | 'bad';
-  probability: {
-    good: number;
-    bad: number;
-  };
-  confidence: 'high' | 'medium' | 'low';
 }
 
 export interface Game {

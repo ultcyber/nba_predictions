@@ -1,6 +1,7 @@
 import { database } from '@/config/database';
 import { Game, GameFilters, PaginationParams, PaginatedResponse } from '@/models/types';
 import { ApiError } from '@/middleware/errorHandler';
+import { classifyGame } from '@/config/prediction';
 
 export class GameService {
   
@@ -40,10 +41,6 @@ export class GameService {
           g.id,
           g.date,
           g.prediction_rating,
-          g.prediction_classification,
-          g.probability_good,
-          g.probability_bad,
-          g.confidence,
           ht.id as home_team_id,
           ht.abbreviation as home_team_abbreviation,
           ht.name as home_team_name,
@@ -94,10 +91,6 @@ export class GameService {
           g.id,
           g.date,
           g.prediction_rating,
-          g.prediction_classification,
-          g.probability_good,
-          g.probability_bad,
-          g.confidence,
           ht.id as home_team_id,
           ht.abbreviation as home_team_abbreviation,
           ht.name as home_team_name,
@@ -154,12 +147,7 @@ export class GameService {
       },
       prediction: {
         rating: r.prediction_rating as number,
-        classification: r.prediction_classification as 'good' | 'bad',
-        probability: {
-          good: r.probability_good as number,
-          bad: r.probability_bad as number
-        },
-        confidence: r.confidence as 'high' | 'medium' | 'low'
+        classification: classifyGame(r.prediction_rating as number)
       }
     };
   }
