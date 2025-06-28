@@ -77,77 +77,52 @@ async function addSampleData(): Promise<void> {
         date: formatDate(today),
         home_team_id: '1610612747', // LAL
         away_team_id: '1610612738', // BOS
-        prediction_rating: 78.5,
-        prediction_classification: 'good',
-        probability_good: 0.82,
-        probability_bad: 0.18,
-        confidence: 'high'
+        prediction_rating: 78.5
       },
       {
         id: '0022400742',
         date: formatDate(today),
         home_team_id: '1610612744', // GSW
         away_team_id: '1610612748', // MIA
-        prediction_rating: 65.2,
-        prediction_classification: 'good',
-        probability_good: 0.68,
-        probability_bad: 0.32,
-        confidence: 'medium'
+        prediction_rating: 65.2
       },
       {
         id: '0022400743',
         date: formatDate(tomorrow),
         home_team_id: '1610612751', // BRK
         away_team_id: '1610612749', // MIL
-        prediction_rating: 42.8,
-        prediction_classification: 'bad',
-        probability_good: 0.35,
-        probability_bad: 0.65,
-        confidence: 'medium'
+        prediction_rating: 42.8
       },
       {
         id: '0022400744',
         date: formatDate(tomorrow),
         home_team_id: '1610612756', // PHX
         away_team_id: '1610612759', // SAS
-        prediction_rating: 89.1,
-        prediction_classification: 'good',
-        probability_good: 0.91,
-        probability_bad: 0.09,
-        confidence: 'high'
+        prediction_rating: 89.1
       },
       {
         id: '0022400745',
         date: formatDate(dayAfter),
         home_team_id: '1610612747', // LAL
         away_team_id: '1610612744', // GSW
-        prediction_rating: 72.3,
-        prediction_classification: 'good',
-        probability_good: 0.75,
-        probability_bad: 0.25,
-        confidence: 'high'
+        prediction_rating: 72.3
       },
       {
         id: '0022400746',
         date: formatDate(dayAfter),
         home_team_id: '1610612738', // BOS
         away_team_id: '1610612748', // MIA
-        prediction_rating: 58.7,
-        prediction_classification: 'good',
-        probability_good: 0.61,
-        probability_bad: 0.39,
-        confidence: 'medium'
+        prediction_rating: 58.7
       }
     ];
 
     for (const game of games) {
       await database.run(
         `INSERT OR IGNORE INTO games 
-         (id, date, home_team_id, away_team_id, prediction_rating, prediction_classification, probability_good, probability_bad, confidence) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         (id, date, home_team_id, away_team_id, prediction_rating) 
+         VALUES (?, ?, ?, ?, ?)`,
         [
-          game.id, game.date, game.home_team_id, game.away_team_id,
-          game.prediction_rating, game.prediction_classification, game.probability_good, game.probability_bad, game.confidence
+          game.id, game.date, game.home_team_id, game.away_team_id, game.prediction_rating
         ]
       );
     }
