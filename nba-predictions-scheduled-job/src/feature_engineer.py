@@ -203,37 +203,24 @@ class FeatureEngineer:
         away_standing = standings[away_team_id]
         
         # Validate required fields
-        required_fields = ['win_pct', 'conference_rank']
+        required_fields = ['conference_rank']
         for field in required_fields:
             if field not in home_standing or home_standing[field] is None:
                 raise FeatureEngineeringError(f"Missing {field} for home team {home_team_id}")
             if field not in away_standing or away_standing[field] is None:
                 raise FeatureEngineeringError(f"Missing {field} for away team {away_team_id}")
         
-        home_win_pct = float(home_standing['win_pct'])
-        away_win_pct = float(away_standing['win_pct'])
         home_conf_rank = int(home_standing['conference_rank'])
         away_conf_rank = int(away_standing['conference_rank'])
         
         # Validate ranges
-        if not (0 <= home_win_pct <= 1):
-            raise FeatureEngineeringError(f"Invalid home team win percentage: {home_win_pct}")
-        if not (0 <= away_win_pct <= 1):
-            raise FeatureEngineeringError(f"Invalid away team win percentage: {away_win_pct}")
         if not (1 <= home_conf_rank <= 15):
             raise FeatureEngineeringError(f"Invalid home team conference rank: {home_conf_rank}")
         if not (1 <= away_conf_rank <= 15):
             raise FeatureEngineeringError(f"Invalid away team conference rank: {away_conf_rank}")
         
-        # Calculate position scores
-        home_score = home_win_pct + (16 - home_conf_rank) / 15
-        away_score = away_win_pct + (16 - away_conf_rank) / 15
-        
-        total_score = home_score + away_score
-        if total_score == 0:
-            raise FeatureEngineeringError("Total position score is zero - invalid standings data")
-        
-        position_score = home_score / total_score
+        # Calculate position score using the formula: 2.0 - ((home_conference_standing + away_conference_standing) / 15)
+        position_score = 2.0 - ((home_conf_rank + away_conf_rank) / 15)
         return round(position_score, 6)
     
     def _get_competitive_seconds(self, game_id: str) -> float:
