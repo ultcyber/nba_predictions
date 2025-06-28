@@ -1,7 +1,7 @@
 # NBA Game Predictions API Specification
 
 ## Overview
-This API provides NBA game predictions with ratings based on machine learning model analysis. The API returns game information, team details, prediction outcomes, and probability scores for finished NBA games.
+This API provides NBA game predictions with ratings based on machine learning model analysis. The API returns game information, team details, and prediction ratings with computed classifications for finished NBA games.
 
 ## Base URL
 ```
@@ -16,7 +16,7 @@ Currently no authentication required for development phase.
 ### 1. Get Game Predictions
 **Endpoint:** `GET /predictions`
 
-**Description:** Returns a list of finished NBA games with predictions and probability scores.
+**Description:** Returns a list of finished NBA games with prediction ratings and computed classifications.
 
 **Query Parameters:**
 - `date` (optional): Filter games by date (YYYY-MM-DD format)
@@ -49,12 +49,7 @@ Currently no authentication required for development phase.
         },
         "prediction": {
           "rating": 65.5,
-          "classification": "good",
-          "probability": {
-            "good": 0.73,
-            "bad": 0.27
-          },
-          "confidence": "high"
+          "classification": "good"
         }
       }
     ],
@@ -100,12 +95,7 @@ Currently no authentication required for development phase.
       },
       "prediction": {
         "rating": 65.5,
-        "classification": "good",
-        "probability": {
-          "good": 0.73,
-          "bad": 0.27
-        },
-        "confidence": "high"
+        "classification": "good"
       }
     }
   }
@@ -177,9 +167,10 @@ The model outputs a continuous rating score which is classified as:
 - **Good**: Rating ≥ 60 (High entertainment value expected)
 - **Bad**: Rating < 60 (Lower entertainment value expected)
 
-## Probability Calculation
+## Rating and Classification
 
-Probabilities are calculated using the model's confidence scores:
-- Values range from 0.0 to 1.0
-- Good + Bad probabilities always sum to 1.0
-- Confidence levels: "high" (≥0.8), "medium" (0.6-0.79), "low" (<0.6)
+Ratings and classifications are determined by the machine learning model:
+- Rating: Numeric score from 0 to 100 representing game quality
+- Classification: Computed from rating using configurable threshold (default: 60)
+  - "good": Rating is at or above the threshold
+  - "bad": Rating is below the threshold

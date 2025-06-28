@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Game } from '../../types/api';
-import ProbabilityBadge from './ProbabilityBadge';
+import RatingBadge from './RatingBadge';
 import TeamLogo from '../ui/TeamLogo';
 
 interface GameCardProps {
@@ -85,7 +85,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, variant = 'default' }) => {
 
       {/* Prediction Section */}
       <div className="border-t border-gray-100 px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
-        <ProbabilityBadge prediction={game.prediction} size="medium" />
+        <RatingBadge prediction={game.prediction} size="medium" />
       </div>
 
       {/* Footer */}
