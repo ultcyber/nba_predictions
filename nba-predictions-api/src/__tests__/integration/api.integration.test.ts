@@ -7,7 +7,7 @@ import { initializeDatabase } from '@/config/initDatabase';
 describe('API Integration Tests', () => {
   beforeAll(async () => {
     // Set up test environment
-    process.env.NODE_ENV = 'development';
+    process.env.NODE_ENV = 'test';
     process.env.DB_PATH = ':memory:';
     process.env.LOG_LEVEL = 'error';
 
@@ -37,7 +37,7 @@ describe('API Integration Tests', () => {
       expectSuccessResponse(response.body);
       expect(response.body.data).toHaveProperty('message', 'NBA Game Predictions API');
       expect(response.body.data).toHaveProperty('version', 'v1');
-      expect(response.body.data).toHaveProperty('environment', 'development');
+      expect(response.body.data).toHaveProperty('environment', 'test');
       expect(response.body.data.endpoints).toHaveProperty('health');
       expect(response.body.data.endpoints).toHaveProperty('predictions');
     });

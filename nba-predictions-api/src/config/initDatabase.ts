@@ -33,6 +33,12 @@ export async function initializeDatabase(): Promise<void> {
 
 async function addSampleData(): Promise<void> {
   try {
+    // Skip sample data in test environment
+    if (process.env.NODE_ENV === 'test' || process.env.DB_PATH === ':memory:') {
+      logger.info('Test environment detected, skipping sample data initialization');
+      return;
+    }
+
     // Check if data already exists
     const existingGamesCount = await database.get<{count: number}>('SELECT COUNT(*) as count FROM games');
     if (existingGamesCount && existingGamesCount.count > 0 ) {

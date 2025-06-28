@@ -30,9 +30,7 @@ export const mockGames: Omit<Game, 'home_team' | 'away_team'>[] = [
     date: '2025-02-08',
     prediction: {
       rating: 65.5,
-      classification: 'good',
-      probability: { good: 0.73, bad: 0.27 },
-      confidence: 'high'
+      classification: 'good'
     }
   },
   {
@@ -40,9 +38,7 @@ export const mockGames: Omit<Game, 'home_team' | 'away_team'>[] = [
     date: '2025-02-07',
     prediction: {
       rating: 45.2,
-      classification: 'bad',
-      probability: { good: 0.35, bad: 0.65 },
-      confidence: 'medium'
+      classification: 'bad'
     }
   }
 ];
@@ -54,10 +50,10 @@ export async function setupTestDatabase(): Promise<void> {
 }
 
 export async function seedTestData(): Promise<void> {
-  // Insert test teams
+  // Insert test teams (use INSERT OR IGNORE to avoid conflicts)
   for (const team of mockTeams) {
     await database.run(
-      'INSERT INTO teams (id, abbreviation, name, conference) VALUES (?, ?, ?, ?)',
+      'INSERT OR IGNORE INTO teams (id, abbreviation, name, conference) VALUES (?, ?, ?, ?)',
       [team.id, team.abbreviation, team.name, team.conference]
     );
   }
@@ -65,39 +61,27 @@ export async function seedTestData(): Promise<void> {
   // Insert test games
   await database.run(
     `INSERT INTO games (
-      id, date, home_team_id, away_team_id, 
-      prediction_rating, prediction_classification, 
-      probability_good, probability_bad, confidence
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      id, date, home_team_id, away_team_id, prediction_rating
+    ) VALUES (?, ?, ?, ?, ?)`,
     [
       mockGames[0].id,
       mockGames[0].date,
       mockTeams[0].id, // LAL home
       mockTeams[1].id, // BOS away
-      mockGames[0].prediction.rating,
-      mockGames[0].prediction.classification,
-      mockGames[0].prediction.probability.good,
-      mockGames[0].prediction.probability.bad,
-      mockGames[0].prediction.confidence
+      mockGames[0].prediction.rating
     ]
   );
 
   await database.run(
     `INSERT INTO games (
-      id, date, home_team_id, away_team_id, 
-      prediction_rating, prediction_classification, 
-      probability_good, probability_bad, confidence
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      id, date, home_team_id, away_team_id, prediction_rating
+    ) VALUES (?, ?, ?, ?, ?)`,
     [
       mockGames[1].id,
       mockGames[1].date,
       mockTeams[2].id, // GSW home
       mockTeams[1].id, // BOS away
-      mockGames[1].prediction.rating,
-      mockGames[1].prediction.classification,
-      mockGames[1].prediction.probability.good,
-      mockGames[1].prediction.probability.bad,
-      mockGames[1].prediction.confidence
+      mockGames[1].prediction.rating
     ]
   );
 }
@@ -142,10 +126,4 @@ export function expectGameStructure(game: Record<string, unknown>): void {
   const prediction = game.prediction as Record<string, unknown>;
   expect(prediction).toHaveProperty('rating');
   expect(prediction).toHaveProperty('classification');
-  expect(prediction).toHaveProperty('probability');
-  expect(prediction).toHaveProperty('confidence');
-
-  const probability = prediction.probability as Record<string, unknown>;
-  expect(probability).toHaveProperty('good');
-  expect(probability).toHaveProperty('bad');
 }

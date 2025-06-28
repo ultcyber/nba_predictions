@@ -5,6 +5,11 @@ describe('GameService', () => {
   let gameService: GameService;
 
   beforeAll(async () => {
+    // Set up test environment with in-memory database
+    process.env.NODE_ENV = 'test';
+    process.env.DB_PATH = ':memory:';
+    process.env.LOG_LEVEL = 'error';
+    
     await setupTestDatabase();
     gameService = new GameService();
   });
