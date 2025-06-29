@@ -93,13 +93,35 @@ const GameList: React.FC<GameListProps> = ({ games, isLoading, error, variant = 
     return <EmptyState selectedDate={new Date().toISOString().split('T')[0]} />;
   }
 
+  // Sort games by classification: good -> mediocre -> bad
+  const getClassificationPriority = (classification: string): number => {
+    switch (classification) {
+      case 'good': return 1;
+      case 'mediocre': return 2;
+      case 'bad': return 3;
+      default: return 4;
+    }
+  };
+
+  const sortedGames = [...games].sort((a, b) => {
+    const priorityA = getClassificationPriority(a.prediction.classification);
+    const priorityB = getClassificationPriority(b.prediction.classification);
+    
+    // If same classification, sort by rating (higher first)
+    if (priorityA === priorityB) {
+      return b.prediction.rating - a.prediction.rating;
+    }
+    
+    return priorityA - priorityB;
+  });
+
   const gridClasses = variant === 'compact' 
     ? 'space-y-2 sm:space-y-3' 
     : 'grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
 
   return (
     <div className={gridClasses}>
-      {games.map((game) => (
+      {sortedGames.map((game) => (
         <GameCard 
           key={game.id} 
           game={game} 
