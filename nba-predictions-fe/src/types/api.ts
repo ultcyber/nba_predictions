@@ -24,7 +24,7 @@ export interface Team {
 
 export interface GamePrediction {
   rating: number;
-  classification: 'good' | 'bad';
+  classification: 'good' | 'mediocre' | 'bad';
 }
 
 export interface Game {

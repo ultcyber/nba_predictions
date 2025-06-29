@@ -11,6 +11,8 @@ const RatingBadge: React.FC<RatingBadgeProps> = ({ prediction, size = 'medium' }
     switch (classification) {
       case 'good':
         return 'bg-green-100 text-green-800 border-green-200';
+      case 'mediocre':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'bad':
         return 'bg-red-100 text-red-800 border-red-200';
       default:
@@ -18,13 +20,16 @@ const RatingBadge: React.FC<RatingBadgeProps> = ({ prediction, size = 'medium' }
     }
   };
 
-  const getRatingColors = (rating: number) => {
-    if (rating >= 80) {
-      return 'text-green-600';
-    } else if (rating >= 60) {
-      return 'text-yellow-600';
-    } else {
-      return 'text-red-600';
+  const getRatingColors = (classification: string) => {
+    switch (classification) {
+      case 'good':
+        return 'text-green-600';
+      case 'mediocre':
+        return 'text-yellow-600';
+      case 'bad':
+        return 'text-red-600';
+      default:
+        return 'text-gray-600';
     }
   };
 
@@ -56,7 +61,7 @@ const RatingBadge: React.FC<RatingBadgeProps> = ({ prediction, size = 'medium' }
       </div>
 
       {/* Rating Display */}
-      <div className={`${getRatingDisplay()} ${getRatingColors(prediction.rating)}`}>
+      <div className={`${getRatingDisplay()} ${getRatingColors(prediction.classification)}`}>
         {prediction.rating}<span className="text-gray-500 text-base">/100</span>
       </div>
     </div>
