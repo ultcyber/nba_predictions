@@ -30,7 +30,7 @@ export const mockGames: Omit<Game, 'home_team' | 'away_team'>[] = [
     date: '2025-02-08',
     prediction: {
       rating: 65.5,
-      classification: 'good'
+      classification: 'mediocre'
     }
   },
   {
