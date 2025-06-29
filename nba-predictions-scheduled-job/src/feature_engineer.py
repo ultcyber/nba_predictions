@@ -371,15 +371,16 @@ class FeatureEngineer:
         Raises:
             FeatureEngineeringError: If DataFrame creation fails
         """
-        # Ensure features are in the correct order for the model
+        # Ensure features are in the correct order matching the training data
+        # Order must match the training notebook: numeric features first, then categorical
         feature_order = [
-            'diff_ranks',
-            'inter_conference', 
-            'scores_diff',
-            'position_score',
-            'competitive_seconds',
             'lead_changes',
-            'rivalry_score'
+            'rivalry_score',
+            'diff_ranks', 
+            'position_score',
+            'scores_diff',
+            'competitive_seconds',
+            'inter_conference'
         ]
         
         try:

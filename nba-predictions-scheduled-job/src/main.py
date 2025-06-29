@@ -1,6 +1,7 @@
 """Main orchestration script for NBA predictions scheduled job."""
 
 import argparse
+import logging
 import sys
 from datetime import date, datetime, timedelta, timezone
 from typing import List, Dict, Any, Optional
@@ -87,7 +88,7 @@ class NBAScheduler:
         try:
             # Determine target date
             if target_date is None:
-                target_date = date.today() + timedelta(days=settings.prediction.default_date_offset)
+                target_date = date.today() + timedelta(days=settings.prediction_default_date_offset)
             
             self.stats["target_date"] = target_date.isoformat()
             
@@ -113,7 +114,7 @@ class NBAScheduler:
             self._generate_and_save_predictions(processed_games)
             
             # Step 4: Create backup if enabled
-            if settings.database.backup_enabled:
+            if settings.database_backup_enabled:
                 logger.info("Step 4: Creating database backup")
                 self.database_manager.backup_database()
             
@@ -206,6 +207,9 @@ class NBAScheduler:
                 # Extract features
                 features = self.feature_engineer.extract_features(game)
                 logger.debug(f"Extracted features for game {game_id}")
+                if logger.isEnabledFor(logging.DEBUG):
+                    feature_summary = self.feature_engineer.create_feature_summary(features)
+                    logger.debug(f"Features for game {game_id}:\n{feature_summary}")
                 
                 # Convert to DataFrame for model
                 features_df = self.feature_engineer.features_to_dataframe(features)

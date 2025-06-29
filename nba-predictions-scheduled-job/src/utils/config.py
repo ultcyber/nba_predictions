@@ -1,82 +1,55 @@
-"""Configuration management using Pydantic Settings."""
+"""Configuration management using python-dotenv."""
 
+import os
 from pathlib import Path
-from typing import Dict
-from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
-class NBAApiSettings(BaseModel):
-    """NBA API configuration."""
-    rate_limit_delay: float = Field(default=1.0, description="Seconds between API requests")
-    retry_attempts: int = Field(default=3, description="Number of retry attempts")
-    timeout: int = Field(default=30, description="Request timeout in seconds")
-
-
-class ModelSettings(BaseModel):
-    """Model configuration."""
-    path: str = Field(default="../nba-predictions-model/xgb_pipeline.pkl", description="Path to trained model")
-    version: str = Field(default="1.0", description="Model version")
-    feature_version: str = Field(default="1.0", description="Feature schema version")
-
-
-class DatabaseSettings(BaseModel):
-    """Database configuration."""
-    path: str = Field(default="../nba-predictions-api/data/nba_predictions.db", description="Database file path")
-    backup_enabled: bool = Field(default=True, description="Enable database backups")
-    backup_path: str = Field(default="./backups/", description="Backup directory path")
-
-
-class PredictionSettings(BaseModel):
-    """Prediction configuration."""
-    confidence_thresholds: Dict[str, float] = Field(
-        default={"high": 0.8, "medium": 0.6}, 
-        description="Confidence level thresholds"
-    )
-    default_date_offset: int = Field(default=-1, description="Default date offset in days")
-
-
-class LoggingSettings(BaseModel):
-    """Logging configuration."""
-    level: str = Field(default="INFO", description="Logging level")
-    file_path: str = Field(default="./logs/scheduler.log", description="Log file path")
-    max_file_size: str = Field(default="10MB", description="Maximum log file size")
-    backup_count: int = Field(default=5, description="Number of log file backups")
-
-
-class Settings(BaseSettings):
-    """Main application settings."""
+class Settings:
+    """Application settings loaded from environment variables."""
     
-    # Nested configuration sections
-    nba_api: NBAApiSettings = Field(default_factory=NBAApiSettings)
-    model: ModelSettings = Field(default_factory=ModelSettings)
-    database: DatabaseSettings = Field(default_factory=DatabaseSettings)
-    prediction: PredictionSettings = Field(default_factory=PredictionSettings)
-    logging: LoggingSettings = Field(default_factory=LoggingSettings)
-    
-    model_config = SettingsConfigDict(
-        env_file='.env',
-        env_file_encoding='utf-8',
-        env_nested_delimiter='__',  # Allows NBA_API__RATE_LIMIT_DELAY
-        env_prefix='NBA_',
-        case_sensitive=False,
-        extra='ignore'
-    )
+    def __init__(self):
+        # Logging settings
+        self.log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
+        self.log_file_path = os.getenv('LOG_FILE_PATH', './logs/scheduler.log')
+        self.log_max_file_size = os.getenv('LOG_MAX_FILE_SIZE', '10MB')
+        self.log_backup_count = int(os.getenv('LOG_BACKUP_COUNT', '5'))
+        
+        # NBA API settings
+        self.nba_api_rate_limit_delay = float(os.getenv('NBA_API_RATE_LIMIT_DELAY', '1.0'))
+        self.nba_api_retry_attempts = int(os.getenv('NBA_API_RETRY_ATTEMPTS', '3'))
+        self.nba_api_timeout = int(os.getenv('NBA_API_TIMEOUT', '30'))
+        
+        # Model settings
+        self.model_path = os.getenv('MODEL_PATH', '../nba-predictions-model/xgb_pipeline.pkl')
+        self.model_version = os.getenv('MODEL_VERSION', '1.0')
+        self.feature_version = os.getenv('FEATURE_VERSION', '1.0')
+        
+        # Database settings
+        self.database_path = os.getenv('DATABASE_PATH', '../nba-predictions-api/data/nba_predictions.db')
+        self.database_backup_enabled = os.getenv('BACKUP_ENABLED', 'true').lower() == 'true'
+        self.database_backup_path = os.getenv('BACKUP_PATH', './backups/')
+        
+        # Prediction settings
+        self.prediction_default_date_offset = int(os.getenv('DEFAULT_DATE_OFFSET', '-1'))
     
     @property
     def database_path_resolved(self) -> Path:
         """Get resolved database path."""
-        return Path(self.database.path).resolve()
+        return Path(self.database_path).resolve()
     
     @property
     def model_path_resolved(self) -> Path:
         """Get resolved model path."""
-        return Path(self.model.path).resolve()
+        return Path(self.model_path).resolve()
     
     @property
     def log_file_path_resolved(self) -> Path:
         """Get resolved log file path."""
-        path = Path(self.logging.file_path)
+        path = Path(self.log_file_path)
         # Create log directory if it doesn't exist
         path.parent.mkdir(parents=True, exist_ok=True)
         return path.resolve()

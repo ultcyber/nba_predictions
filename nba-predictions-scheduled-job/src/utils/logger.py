@@ -31,7 +31,7 @@ def setup_logger(
         return logger
     
     # Set log level
-    log_level = level or settings.logging.level
+    log_level = level or settings.log_level
     logger.setLevel(getattr(logging, log_level.upper()))
     
     # Create formatter
@@ -42,7 +42,7 @@ def setup_logger(
     
     # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.INFO)
+    console_handler.setLevel(getattr(logging, log_level.upper()))
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
     
@@ -54,12 +54,12 @@ def setup_logger(
     log_file.parent.mkdir(parents=True, exist_ok=True)
     
     # Parse max file size
-    max_bytes = _parse_file_size(settings.logging.max_file_size)
+    max_bytes = _parse_file_size(settings.log_max_file_size)
     
     file_handler = logging.handlers.RotatingFileHandler(
         filename=log_file,
         maxBytes=max_bytes,
-        backupCount=settings.logging.backup_count,
+        backupCount=settings.log_backup_count,
         encoding='utf-8'
     )
     file_handler.setLevel(getattr(logging, log_level.upper()))

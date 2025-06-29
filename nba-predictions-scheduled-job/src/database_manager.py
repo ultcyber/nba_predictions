@@ -15,9 +15,9 @@ class DatabaseManager:
     
     def __init__(self):
         """Initialize database manager."""
-        self.db_path = Path(settings.database.path)
-        self.backup_enabled = settings.database.backup_enabled
-        self.backup_path = Path(settings.database.backup_path)
+        self.db_path = Path(settings.database_path)
+        self.backup_enabled = settings.database_backup_enabled
+        self.backup_path = Path(settings.database_backup_path)
         
         # Verify database exists and has correct schema
         self._verify_database()

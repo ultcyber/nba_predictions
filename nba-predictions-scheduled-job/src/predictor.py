@@ -18,8 +18,8 @@ class GamePredictor:
     def __init__(self):
         """Initialize predictor and load model."""
         self.model = None
-        self.model_version = settings.model.version
-        self.feature_version = settings.model.feature_version
+        self.model_version = settings.model_version
+        self.feature_version = settings.feature_version
         
         # Load model during initialization
         self._load_model()

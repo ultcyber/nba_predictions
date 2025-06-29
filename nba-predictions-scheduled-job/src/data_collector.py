@@ -25,8 +25,8 @@ class NBADataCollector:
     def __init__(self):
         """Initialize data collector."""
         self.team_names = teams.get_teams()
-        self.rate_limit_delay = settings.nba_api.rate_limit_delay
-        self.retry_attempts = settings.nba_api.retry_attempts
+        self.rate_limit_delay = settings.nba_api_rate_limit_delay
+        self.retry_attempts = settings.nba_api_retry_attempts
         
     def get_completed_games_for_date(self, target_date: date) -> List[Dict[str, Any]]:
         """Get all completed games for a specific date.
@@ -58,7 +58,7 @@ class NBADataCollector:
                 logger.info(f"No games found for {target_date}")
                 return []
             
-            # Filter to get unique games (each game appears twice in the data)
+            # Filter to get unique completed games (each game appears twice in the data)
             completed_games = []
             processed_game_ids = set()
             
@@ -69,6 +69,20 @@ class NBADataCollector:
                     continue
                     
                 processed_game_ids.add(game_id)
+                
+                # Check if game is actually completed by fetching game details
+                try:
+                    game_details = self.fetch_game_details(game_id)
+                    game_status = game_details.get('game_status', '')
+                    
+                    # Only include games with "Final" status
+                    if not game_status.startswith('Final'):
+                        logger.debug(f"Skipping game {game_id} with status: {game_status}")
+                        continue
+                        
+                except Exception as e:
+                    logger.warning(f"Could not verify status for game {game_id}: {e}")
+                    continue
                 
                 # Basic game information
                 game_info = {
@@ -101,7 +115,6 @@ class NBADataCollector:
             return completed_games
             
         except Exception as e:
-            logger.error(f"Error fetching games for {target_date}: {e}")
             raise DataCollectionError(f"Failed to fetch games for {target_date}") from e
     
     def fetch_game_details(self, game_id: str) -> Dict[str, Any]:
@@ -123,21 +136,30 @@ class NBADataCollector:
             
             dataframes = boxscore.get_data_frames()
             
-            if not dataframes or len(dataframes) < 2:
+            if not dataframes or len(dataframes) < 6:
                 raise DataCollectionError(f"Incomplete boxscore data for game {game_id}")
             
-            game_summary = dataframes[0].iloc[0]
-            other_stats = dataframes[1].iloc[0]
+            # Extract scores from DataFrame 5 which contains the PTS column
+            scores_df = dataframes[5]  # Line score dataframe with final scores
+            if scores_df.empty or 'PTS' not in scores_df.columns:
+                raise DataCollectionError(f"No final scores found for game {game_id}")
             
-            # Log available columns for debugging
-            logger.debug(f"Game summary columns: {list(game_summary.index)}")
-            logger.debug(f"Other stats columns: {list(other_stats.index)}")
+            scores = scores_df['PTS'].tolist()
+            if len(scores) < 2:
+                raise DataCollectionError(f"Invalid score data for game {game_id}")
+            
+            home_score = int(scores[0])  # First row is home team
+            away_score = int(scores[1])  # Second row is away team
+            
+            # Get other stats (lead changes, etc.)
+            other_stats = dataframes[1].iloc[0] if len(dataframes) > 1 and not dataframes[1].empty else {}
+            game_summary = dataframes[0].iloc[0] if len(dataframes) > 0 and not dataframes[0].empty else {}
             
             # Extract relevant information
             game_details = {
                 'game_id': game_id,
-                'home_team_score': int(game_summary.get('HOME_TEAM_PTS', game_summary.get('PTS_HOME', 0))),
-                'away_team_score': int(game_summary.get('VISITOR_TEAM_PTS', game_summary.get('PTS_AWAY', 0))),
+                'home_team_score': int(home_score),
+                'away_team_score': int(away_score),
                 'lead_changes': int(other_stats.get('LEAD_CHANGES', 0)),
                 'times_tied': int(other_stats.get('TIMES_TIED', 0)),
                 'game_status': game_summary.get('GAME_STATUS_TEXT', 'Final'),
@@ -147,8 +169,7 @@ class NBADataCollector:
             return game_details
             
         except Exception as e:
-            logger.error(f"Error fetching game details for {game_id}: {e}")
-            raise DataCollectionError(f"Failed to fetch game details for {game_id}") from e
+            raise DataCollectionError(f"Failed to fetch game details for {game_id} : {e}") from e
     
     def calculate_competitive_seconds(self, game_id: str) -> float:
         """Calculate seconds when the game was competitive (within 5 points).
@@ -186,8 +207,7 @@ class NBADataCollector:
             return float(total_seconds) if total_seconds else 0.0
             
         except Exception as e:
-            logger.error(f"Error calculating competitive seconds for {game_id}: {e}")
-            return 0.0  # Return 0 instead of failing completely
+            raise DataCollectionError(f"Error calculating competitive seconds for {game_id}: {e}") from e
     
     def calculate_rivalry_score(self, home_team_id: int, away_team_id: int, game_date: date) -> float:
         """Calculate rivalry score based on recent playoff meetings and close games.
@@ -216,12 +236,9 @@ class NBADataCollector:
                 home_team_id, away_team_id, five_years_ago, game_date, "Regular Season"
             )
             
-            if not regular_games:
-                return 0.0
-            
             # Calculate close games ratio (within 10 points)
             close_games = [game for game in regular_games if abs(game) <= 10]
-            close_games_ratio = len(close_games) / len(regular_games) if regular_games else 0
+            close_games_ratio = len(close_games) / len(regular_games)
             
             # Rivalry score formula: playoff games weight + close games ratio weight
             rivalry_score = len(playoff_games) * 0.7 + close_games_ratio * 0.3
@@ -229,8 +246,7 @@ class NBADataCollector:
             return float(rivalry_score)
             
         except Exception as e:
-            logger.error(f"Error calculating rivalry score: {e}")
-            return 0.0  # Return 0 instead of failing
+            raise DataCollectionError(f"Error calculating rivalry score: {e}") from e
     
     def get_team_standings(self, target_date: date) -> Dict[int, Dict[str, Any]]:
         """Get team standings for ranking calculations.
@@ -273,8 +289,7 @@ class NBADataCollector:
             return team_standings
             
         except Exception as e:
-            logger.error(f"Error fetching team standings: {e}")
-            return {}
+            raise DataCollectionError(f"Error fetching team standings: {e}") from e
     
     def _retry_api_call(self, api_func):
         """Retry API call with exponential backoff."""
