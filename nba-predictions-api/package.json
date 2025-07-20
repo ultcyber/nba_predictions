@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc && tsc-alias",
+    "build": "tsc && tsc-alias && cp src/config/schema.sql dist/config/",
     "start": "node dist/server.js",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -13,7 +13,8 @@
     "test:ci": "jest --ci --coverage --watchAll=false",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:init": "node -e \"require('./dist/config/database').database.connect().then(() => require('./dist/config/initDatabase').initializeDatabase()).then(() => process.exit(0))\""
   },
   "keywords": [
     "nba",

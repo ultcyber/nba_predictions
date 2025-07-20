@@ -21,6 +21,7 @@ export const errorHandler = (
     error: err.message,
     stack: err.stack,
     statusCode,
+    details: err.details,
     code: errorCode,
     url: req.url,
     method: req.method,
@@ -34,8 +35,6 @@ export const errorHandler = (
     error: {
       code: errorCode,
       message: err.message,
-      ...(err.details && { details: err.details }),
-      ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
     }
   });
 };
