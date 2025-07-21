@@ -3,7 +3,7 @@ import path from 'path';
 import { database } from './database';
 import { logger } from '@/utils/logger';
 
-export async function initializeDatabase(): Promise<void> {
+export async function initializeSchema(): Promise<void> {
   try {
     // Read schema SQL file
     const schemaPath = path.join(__dirname, 'schema.sql');
@@ -21,6 +21,17 @@ export async function initializeDatabase(): Promise<void> {
         }
       });
     });
+    
+  } catch (error) {
+    logger.error('Database schema initialization error', { error: (error as Error).message });
+    throw error;
+  }
+}
+
+export async function initializeDatabase(): Promise<void> {
+  try {
+    // Initialize schema
+    await initializeSchema();
 
     // Add sample data if tables are empty
     await addSampleData();

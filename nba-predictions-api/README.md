@@ -83,6 +83,16 @@ npm start
 - `probability_good` / `probability_bad` - Prediction probabilities
 - `confidence` - "high", "medium", or "low"
 
+## Database Commands
+
+```bash
+# Initialize database with schema and sample data (development)
+npm run db:init
+
+# Initialize database schema only (production)
+npm run db:schema
+```
+
 ## Development Commands
 
 ```bash
