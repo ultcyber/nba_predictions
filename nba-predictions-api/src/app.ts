@@ -15,6 +15,8 @@ import { swaggerOptions } from '@/config/swagger';
 
 const app = express();
 
+app.set('trust proxy', 'loopback')
+
 // Rate limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
