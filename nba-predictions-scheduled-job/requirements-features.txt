@@ -1,0 +1,8 @@
+# Requirements for data collection + feature engineering steps
+# Includes NBA API and data processing dependencies
+
+nba_api>=1.4.1
+pandas>=2.2.0
+numpy>=1.26.0
+python-dotenv>=1.0.0
+requests>=2.31.0
