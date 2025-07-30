@@ -1,0 +1,307 @@
+{
+  "metadata": {
+    "step": "features",
+    "timestamp": "2025-07-30T13:59:11.030738+00:00",
+    "target_date": "2025-01-15",
+    "total_games": 11
+  },
+  "games": [
+    {
+      "game_id": "0022400566",
+      "raw_data": {
+        "game_id": "0022400566",
+        "date": "2025-01-15",
+        "home_team_id": 1610612740,
+        "away_team_id": 1610612742,
+        "home_team_abbreviation": "NOP",
+        "away_team_abbreviation": "DAL",
+        "season_id": "22024",
+        "home_team_score": 119,
+        "away_team_score": 116,
+        "lead_changes": 5,
+        "times_tied": 7,
+        "game_status": "Final",
+        "attendance": 0
+      },
+      "features": {
+        "diff_ranks": 0,
+        "inter_conference": 0,
+        "scores_diff": 3,
+        "position_score": 1.866667,
+        "competitive_seconds": 509.0,
+        "lead_changes": 5,
+        "rivalry_score": 0.16666666666666666
+      }
+    },
+    {
+      "game_id": "0022400561",
+      "raw_data": {
+        "game_id": "0022400561",
+        "date": "2025-01-15",
+        "home_team_id": 1610612755,
+        "away_team_id": 1610612752,
+        "home_team_abbreviation": "PHI",
+        "away_team_abbreviation": "NYK",
+        "season_id": "22024",
+        "home_team_score": 125,
+        "away_team_score": 119,
+        "lead_changes": 0,
+        "times_tied": 5,
+        "game_status": "Final/OT",
+        "attendance": 0
+      },
+      "features": {
+        "diff_ranks": 0,
+        "inter_conference": 0,
+        "scores_diff": 6,
+        "position_score": 1.866667,
+        "competitive_seconds": 283.0,
+        "lead_changes": 0,
+        "rivalry_score": 4.35
+      }
+    },
+    {
+      "game_id": "0022400569",
+      "raw_data": {
+        "game_id": "0022400569",
+        "date": "2025-01-15",
+        "home_team_id": 1610612762,
+        "away_team_id": 1610612766,
+        "home_team_abbreviation": "UTA",
+        "away_team_abbreviation": "CHA",
+        "season_id": "22024",
+        "home_team_score": 112,
+        "away_team_score": 117,
+        "lead_changes": 6,
+        "times_tied": 2,
+        "game_status": "Final",
+        "attendance": 0
+      },
+      "features": {
+        "diff_ranks": 0,
+        "inter_conference": 1,
+        "scores_diff": 5,
+        "position_score": 1.866667,
+        "competitive_seconds": 355.0,
+        "lead_changes": 6,
+        "rivalry_score": 0.16666666666666666
+      }
+    },
+    {
+      "game_id": "0022400562",
+      "raw_data": {
+        "game_id": "0022400562",
+        "date": "2025-01-15",
+        "home_team_id": 1610612761,
+        "away_team_id": 1610612738,
+        "home_team_abbreviation": "TOR",
+        "away_team_abbreviation": "BOS",
+        "season_id": "22024",
+        "home_team_score": 97,
+        "away_team_score": 110,
+        "lead_changes": 6,
+        "times_tied": 4,
+        "game_status": "Final",
+        "attendance": 0
+      },
+      "features": {
+        "diff_ranks": 0,
+        "inter_conference": 0,
+        "scores_diff": 13,
+        "position_score": 1.866667,
+        "competitive_seconds": 410.0,
+        "lead_changes": 6,
+        "rivalry_score": 5.042105263157894
+      }
+    },
+    {
+      "game_id": "0022400565",
+      "raw_data": {
+        "game_id": "0022400565",
+        "date": "2025-01-15",
+        "home_team_id": 1610612750,
+        "away_team_id": 1610612744,
+        "home_team_abbreviation": "MIN",
+        "away_team_abbreviation": "GSW",
+        "season_id": "22024",
+        "home_team_score": 116,
+        "away_team_score": 115,
+        "lead_changes": 0,
+        "times_tied": 1,
+        "game_status": "Final",
+        "attendance": 0
+      },
+      "features": {
+        "diff_ranks": 0,
+        "inter_conference": 0,
+        "scores_diff": 1,
+        "position_score": 1.866667,
+        "competitive_seconds": 141.0,
+        "lead_changes": 0,
+        "rivalry_score": 0.16666666666666666
+      }
+    },
+    {
+      "game_id": "0022400568",
+      "raw_data": {
+        "game_id": "0022400568",
+        "date": "2025-01-15",
+        "home_team_id": 1610612743,
+        "away_team_id": 1610612745,
+        "home_team_abbreviation": "DEN",
+        "away_team_abbreviation": "HOU",
+        "season_id": "22024",
+        "home_team_score": 108,
+        "away_team_score": 128,
+        "lead_changes": 0,
+        "times_tied": 1,
+        "game_status": "Final",
+        "attendance": 0
+      },
+      "features": {
+        "diff_ranks": 0,
+        "inter_conference": 0,
+        "scores_diff": 20,
+        "position_score": 1.866667,
+        "competitive_seconds": 156.0,
+        "lead_changes": 0,
+        "rivalry_score": 0.08823529411764706
+      }
+    },
+    {
+      "game_id": "0022400570",
+      "raw_data": {
+        "game_id": "0022400570",
+        "date": "2025-01-15",
+        "home_team_id": 1610612747,
+        "away_team_id": 1610612748,
+        "home_team_abbreviation": "LAL",
+        "away_team_abbreviation": "MIA",
+        "season_id": "22024",
+        "home_team_score": 117,
+        "away_team_score": 108,
+        "lead_changes": 14,
+        "times_tied": 6,
+        "game_status": "Final",
+        "attendance": 0
+      },
+      "features": {
+        "diff_ranks": 0,
+        "inter_conference": 1,
+        "scores_diff": 9,
+        "position_score": 1.866667,
+        "competitive_seconds": 417.0,
+        "lead_changes": 14,
+        "rivalry_score": 4.3999999999999995
+      }
+    },
+    {
+      "game_id": "0022400564",
+      "raw_data": {
+        "game_id": "0022400564",
+        "date": "2025-01-15",
+        "home_team_id": 1610612749,
+        "away_team_id": 1610612753,
+        "home_team_abbreviation": "MIL",
+        "away_team_abbreviation": "ORL",
+        "season_id": "22024",
+        "home_team_score": 122,
+        "away_team_score": 93,
+        "lead_changes": 4,
+        "times_tied": 1,
+        "game_status": "Final",
+        "attendance": 0
+      },
+      "features": {
+        "diff_ranks": 0,
+        "inter_conference": 0,
+        "scores_diff": 29,
+        "position_score": 1.866667,
+        "competitive_seconds": 69.0,
+        "lead_changes": 4,
+        "rivalry_score": 3.5833333333333335
+      }
+    },
+    {
+      "game_id": "0022400567",
+      "raw_data": {
+        "game_id": "0022400567",
+        "date": "2025-01-15",
+        "home_team_id": 1610612759,
+        "away_team_id": 1610612763,
+        "home_team_abbreviation": "SAS",
+        "away_team_abbreviation": "MEM",
+        "season_id": "22024",
+        "home_team_score": 115,
+        "away_team_score": 129,
+        "lead_changes": 2,
+        "times_tied": 4,
+        "game_status": "Final",
+        "attendance": 0
+      },
+      "features": {
+        "diff_ranks": 0,
+        "inter_conference": 0,
+        "scores_diff": 14,
+        "position_score": 1.866667,
+        "competitive_seconds": 448.0,
+        "lead_changes": 2,
+        "rivalry_score": 0.1736842105263158
+      }
+    },
+    {
+      "game_id": "0022400563",
+      "raw_data": {
+        "game_id": "0022400563",
+        "date": "2025-01-15",
+        "home_team_id": 1610612741,
+        "away_team_id": 1610612737,
+        "home_team_abbreviation": "CHI",
+        "away_team_abbreviation": "ATL",
+        "season_id": "22024",
+        "home_team_score": 110,
+        "away_team_score": 94,
+        "lead_changes": 0,
+        "times_tied": 3,
+        "game_status": "Final",
+        "attendance": 0
+      },
+      "features": {
+        "diff_ranks": 0,
+        "inter_conference": 0,
+        "scores_diff": 16,
+        "position_score": 1.866667,
+        "competitive_seconds": 203.0,
+        "lead_changes": 0,
+        "rivalry_score": 0.1263157894736842
+      }
+    },
+    {
+      "game_id": "0022400571",
+      "raw_data": {
+        "game_id": "0022400571",
+        "date": "2025-01-15",
+        "home_team_id": 1610612746,
+        "away_team_id": 1610612751,
+        "home_team_abbreviation": "LAC",
+        "away_team_abbreviation": "BKN",
+        "season_id": "22024",
+        "home_team_score": 126,
+        "away_team_score": 67,
+        "lead_changes": 6,
+        "times_tied": 4,
+        "game_status": "Final",
+        "attendance": 0
+      },
+      "features": {
+        "diff_ranks": 0,
+        "inter_conference": 1,
+        "scores_diff": 59,
+        "position_score": 1.866667,
+        "competitive_seconds": 204.0,
+        "lead_changes": 6,
+        "rivalry_score": 0.1636363636363636
+      }
+    }
+  ]
+}

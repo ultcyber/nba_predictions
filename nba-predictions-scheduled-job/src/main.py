@@ -478,7 +478,11 @@ class NBAScheduler:
         
         # Get games data
         if input_data:
-            games = input_data.get('games', [])
+            # Handle both direct list (from previous step) and JSON dict (from file)
+            if isinstance(input_data, list):
+                games = input_data
+            else:
+                games = input_data.get('games', [])
             logger.info(f"Using {len(games)} games from input data")
         else:
             games = self._collect_games_data(target_date)
@@ -515,7 +519,11 @@ class NBAScheduler:
         self.predictor = GamePredictor()
         
         # Get games with features
-        games = input_data.get('games', [])
+        if isinstance(input_data, list):
+            games = input_data
+        else:
+            games = input_data.get('games', [])
+        
         if not games:
             logger.warning("No games found in input data for prediction")
             return []
@@ -566,7 +574,11 @@ class NBAScheduler:
         self.database_manager = DatabaseManager()
         
         # Get predictions
-        predictions = input_data.get('predictions', [])
+        if isinstance(input_data, list):
+            predictions = input_data
+        else:
+            predictions = input_data.get('predictions', [])
+        
         if not predictions:
             logger.warning("No predictions found in input data for storage")
             return {"saved": 0}
