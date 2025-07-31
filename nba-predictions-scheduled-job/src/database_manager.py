@@ -111,8 +111,8 @@ class DatabaseManager:
                 
                 # First, ensure teams exist
                 self._ensure_teams_exist(conn, [
-                    prediction_data['home_team_id'],
-                    prediction_data['away_team_id']
+                    (prediction_data['home_team_id'], prediction_data.get('home_team_abbreviation')),
+                    (prediction_data['away_team_id'], prediction_data.get('away_team_abbreviation'))
                 ])
                 
                 # Insert or update game with prediction
@@ -146,12 +146,12 @@ class DatabaseManager:
             logger.error(f"Database error saving prediction: {e}")
             raise DatabaseError(f"Failed to save prediction for game {prediction_data['game_id']}: {e}") from e
     
-    def _ensure_teams_exist(self, conn: sqlite3.Connection, team_ids: List[str]) -> None:
+    def _ensure_teams_exist(self, conn: sqlite3.Connection, team_data: List[tuple]) -> None:
         """Ensure teams exist in the database by checking and inserting if needed.
         
         Args:
             conn: Database connection
-            team_ids: List of team IDs to check
+            team_data: List of tuples (team_id, team_abbreviation)
             
         Raises:
             DatabaseError: If teams don't exist and can't be created
@@ -159,52 +159,67 @@ class DatabaseManager:
         cursor = conn.cursor()
         
         from nba_api.stats.static import teams as nba_teams
-        from nba_api.stats.endpoints import leaguestandingsv3
         
-        for team_id in team_ids:
+        for team_id, team_abbr in team_data:
             # Check if team exists
             cursor.execute("SELECT id FROM teams WHERE id = ?", (team_id,))
             
             if not cursor.fetchone():
                 logger.warning(f"Team {team_id} not found in database - creating team record")
                 
-                # Get team info from NBA API
+                if not team_abbr:
+                    raise DatabaseError(f"Team abbreviation missing for team {team_id}")
+                
+                # Get conference using abbreviation
+                conference = self._determine_team_conference_by_abbr(team_abbr, team_id)
+                
+                # Get team name from NBA API (for display purposes)
                 all_teams = nba_teams.get_teams()
                 team_info = next((t for t in all_teams if t['id'] == int(team_id)), None)
+                team_name = team_info['full_name'] if team_info else f"Team {team_abbr}"
                 
-                if team_info:
-                    # Get conference and division from standings
-                    try:
-                        standings = leaguestandingsv3.LeagueStandingsV3(
-                            season="2024-25",
-                            season_type="Regular Season"
-                        )
-                        standings_df = standings.get_data_frames()[0]
-                        team_standing = standings_df[standings_df['TeamID'] == int(team_id)]
-                        
-                        if not team_standing.empty:
-                            conference = team_standing.iloc[0].get('Conference', team_standing.iloc[0].get('CONFERENCE', 'Unknown'))
-                        else:
-                            conference = 'Unknown'
-                    except:
-                        conference = 'Unknown'
-                    
-                    # Insert team record
-                    cursor.execute("""
-                        INSERT INTO teams (id, name, abbreviation, conference)
-                        VALUES (?, ?, ?, ?)
-                    """, (
-                        str(team_info['id']),
-                        team_info['full_name'],
-                        team_info['abbreviation'],
-                        conference
-                    ))
-                    logger.info(f"Created team record for {team_info['full_name']} ({team_id}) - {conference} Conference")
-                else:
-                    raise DatabaseError(f"Team {team_id} not found in NBA API data")
+                # Insert team record
+                cursor.execute("""
+                    INSERT INTO teams (id, name, abbreviation, conference)
+                    VALUES (?, ?, ?, ?)
+                """, (
+                    str(team_id),
+                    team_name,
+                    team_abbr,
+                    conference
+                ))
+                logger.info(f"Created team record for {team_name} ({team_id}) - {conference} Conference")
         
         # Commit team insertions
         conn.commit()
+    
+    def _determine_team_conference_by_abbr(self, team_abbr: str, team_id: str) -> str:
+        """Determine team conference using team abbreviation.
+        
+        Args:
+            team_abbr: Team abbreviation (e.g., 'LAL', 'BOS')
+            team_id: Team ID
+            
+        Returns:
+            Conference ('East' or 'West')
+            
+        Raises:
+            DatabaseError: If team abbreviation is not found
+        """
+        # Eastern Conference teams
+        east_teams = {'ATL', 'BOS', 'BKN', 'CHA', 'CHI', 'CLE', 'DET', 'IND', 
+                      'MIA', 'MIL', 'NYK', 'ORL', 'PHI', 'TOR', 'WAS'}
+        
+        # Western Conference teams  
+        west_teams = {'DAL', 'DEN', 'GSW', 'HOU', 'LAC', 'LAL', 'MEM', 'MIN',
+                      'NOP', 'OKC', 'PHX', 'POR', 'SAC', 'SAS', 'UTA'}
+        
+        if team_abbr in east_teams:
+            return 'East'
+        elif team_abbr in west_teams:
+            return 'West'
+        else:
+            raise DatabaseError(f"Unknown team abbreviation '{team_abbr}' for team {team_id}")
     
     def check_existing_prediction(self, game_id: str) -> bool:
         """Check if a prediction already exists for a game.

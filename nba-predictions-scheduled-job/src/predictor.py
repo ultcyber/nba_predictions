@@ -123,6 +123,10 @@ class GamePredictor:
             "away_team_id": game_data["away_team_id"],
             "game_date": game_data["date"],
             
+            # Team information (for database operations)
+            "home_team_abbreviation": game_data.get("home_team_abbreviation"),
+            "away_team_abbreviation": game_data.get("away_team_abbreviation"),
+            
             # Prediction results
             "rating": prediction["rating"],
             

@@ -84,7 +84,7 @@ class NBADataCollector:
                     logger.warning(f"Could not verify status for game {game_id}: {e}")
                     continue
                 
-                # Basic game information
+                # Basic game information with details merged
                 game_info = {
                     'game_id': game_id,
                     'date': target_date.isoformat(),
@@ -94,6 +94,9 @@ class NBADataCollector:
                     'away_team_abbreviation': None,
                     'season_id': game['SEASON_ID']
                 }
+                
+                # Merge game details (scores, lead changes, etc.)
+                game_info.update(game_details)
                 
                 # Parse team information from matchup
                 matchup = game['MATCHUP']  # Format: "LAL vs. BOS" or "LAL @ BOS"

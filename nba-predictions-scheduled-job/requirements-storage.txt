@@ -1,0 +1,8 @@
+# Requirements for prediction + database storage steps
+# Minimal dependencies for database operations
+
+pandas>=2.2.0
+numpy>=1.26.0
+python-dotenv>=1.0.0
+# Note: Database drivers (like sqlite3) are included in Python standard library
+# Add specific database drivers here if using PostgreSQL, MySQL, etc.
