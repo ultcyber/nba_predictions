@@ -2,6 +2,8 @@
 
 A comprehensive system for predicting NBA game quality using machine learning, featuring a RESTful API, automated data collection, and a modern web interface.
 
+https://bballpredictions.com
+
 ## 🏀 Overview
 
 This system analyzes NBA games and predicts their entertainment value on a scale of 0-100, classifying them as "good", "mediocre", or "bad" based on factors like rivalry scores, competitive moments, lead changes, and team standings.
