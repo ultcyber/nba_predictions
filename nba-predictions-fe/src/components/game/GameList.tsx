@@ -46,9 +46,9 @@ const EmptyState: React.FC<{ selectedDate: string }> = ({ selectedDate }) => (
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
     </div>
-    <h3 className="text-lg font-medium text-gray-900 mb-2">No games scheduled</h3>
+    <h3 className="text-lg font-medium text-gray-900 mb-2">No predictions</h3>
     <p className="text-gray-500 max-w-sm mx-auto">
-      There are no NBA games scheduled for {new Date(selectedDate).toLocaleDateString('en-US', { 
+      There are no NBA game predictions for {new Date(selectedDate).toLocaleDateString('en-US', { 
         weekday: 'long', 
         year: 'numeric', 
         month: 'long', 

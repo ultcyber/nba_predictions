@@ -2,13 +2,10 @@ import React, { useState } from 'react';
 import { usePredictions } from '../hooks/useApi';
 import DatePicker from '../components/ui/DatePicker';
 import GameList from '../components/game/GameList';
+import { getDefaultDate, formatDateForAPI } from '../utils/dateUtils';
 
 const Home: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  
-  const formatDateForAPI = (date: Date): string => {
-    return date.toISOString().split('T')[0]; // YYYY-MM-DD format
-  };
+  const [selectedDate, setSelectedDate] = useState<Date>(getDefaultDate());
 
   const { data: predictionsData, isLoading, error } = usePredictions({
     date: formatDateForAPI(selectedDate)
