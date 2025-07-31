@@ -38,10 +38,6 @@ const GameCard: React.FC<GameCardProps> = ({ game, variant = 'default' }) => {
             </div>
             <TeamLogo team={game.home_team} size="small" />
           </div>
-          <div className="text-right">
-            <div className="text-base sm:text-lg font-bold text-gray-900">{game.prediction.rating}</div>
-            <div className="text-xs text-gray-500">rating</div>
-          </div>
         </div>
         <div className="mt-2 pt-2 border-t border-gray-100">
           <a 
@@ -106,9 +102,8 @@ const GameCard: React.FC<GameCardProps> = ({ game, variant = 'default' }) => {
 
       {/* Footer */}
       <div className="border-t border-gray-100 px-4 sm:px-6 py-2 sm:py-3 bg-white">
-        <div className="flex justify-between items-center text-xs text-gray-500 mb-2">
+        <div className="text-center text-xs text-gray-500 mb-2">
           <span>Game ID: {game.id}</span>
-          <span>NBA Prediction</span>
         </div>
         <div className="text-center">
           <a 
