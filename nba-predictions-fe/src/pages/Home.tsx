@@ -42,6 +42,7 @@ const Home: React.FC = () => {
         games={predictionsData?.success ? predictionsData.data.data : []}
         isLoading={isLoading}
         error={error}
+        selectedDate={formatDateForAPI(selectedDate)}
       />
     </div>
   );

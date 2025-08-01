@@ -7,6 +7,7 @@ interface GameListProps {
   isLoading?: boolean;
   error?: Error | null;
   variant?: 'default' | 'compact';
+  selectedDate?: string;
 }
 
 const GameListSkeleton: React.FC = () => (
@@ -80,7 +81,7 @@ const ErrorState: React.FC<{ onRetry?: () => void }> = ({ onRetry }) => (
   </div>
 );
 
-const GameList: React.FC<GameListProps> = ({ games, isLoading, error, variant = 'default' }) => {
+const GameList: React.FC<GameListProps> = ({ games, isLoading, error, variant = 'default', selectedDate }) => {
   if (isLoading) {
     return <GameListSkeleton />;
   }
@@ -90,7 +91,7 @@ const GameList: React.FC<GameListProps> = ({ games, isLoading, error, variant = 
   }
 
   if (!games || games.length === 0) {
-    return <EmptyState selectedDate={new Date().toISOString().split('T')[0]} />;
+    return <EmptyState selectedDate={selectedDate || new Date().toISOString().split('T')[0]} />;
   }
 
   // Sort games by classification: good -> mediocre -> bad
