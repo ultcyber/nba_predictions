@@ -82,11 +82,14 @@ class GamePredictor:
             
             # Extract scalar value from numpy array and round to 2 decimal places
             if hasattr(rating_array, 'item'):
-                rating = round(float(rating_array.item()), 2)
+                raw_rating = float(rating_array.item())
             elif hasattr(rating_array, '__getitem__') and len(rating_array) > 0:
-                rating = round(float(rating_array[0]), 2)
+                raw_rating = float(rating_array[0])
             else:
-                rating = round(float(rating_array), 2)
+                raw_rating = float(rating_array)
+            
+            # Clamp rating to 0-100 range to match training data bounds
+            rating = round(max(0.0, min(100.0, raw_rating)), 2)
             
             prediction = {
                 "rating": rating,
