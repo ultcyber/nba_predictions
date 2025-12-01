@@ -1,14 +1,17 @@
 """NBA data collection module using nba_api."""
 
 import time
+import re
 from datetime import datetime, date
 from typing import List, Dict, Any, Optional
 from random import randint
+import traceback
+import pandas as pd
 
 from nba_api.stats.endpoints import (
     leaguegamefinder, 
-    boxscoresummaryv2, 
-    winprobabilitypbp,
+    boxscoresummaryv3, 
+    playbyplayv3,
     leaguestandingsv3
 )
 from nba_api.stats.static import teams
@@ -81,6 +84,7 @@ class NBADataCollector:
                         continue
                         
                 except Exception as e:
+                    traceback.print_exception(e) 
                     logger.warning(f"Could not verify status for game {game_id}: {e}")
                     continue
                 
@@ -134,7 +138,7 @@ class NBADataCollector:
         try:
             # Get box score summary
             boxscore = self._retry_api_call(
-                lambda: boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id)
+                lambda: boxscoresummaryv3.BoxScoreSummaryV3(game_id=game_id)
             )
             
             dataframes = boxscore.get_data_frames()
@@ -143,19 +147,20 @@ class NBADataCollector:
                 raise DataCollectionError(f"Incomplete boxscore data for game {game_id}")
             
             # Extract scores from DataFrame 5 which contains the PTS column
-            scores_df = dataframes[5]  # Line score dataframe with final scores
-            if scores_df.empty or 'PTS' not in scores_df.columns:
+            scores_df = dataframes[4]  # Line score dataframe with final scores
+            if scores_df.empty or 'score' not in scores_df.columns:
                 raise DataCollectionError(f"No final scores found for game {game_id}")
             
-            scores = scores_df['PTS'].tolist()
+            scores = scores_df['score'].tolist()
             if len(scores) < 2:
                 raise DataCollectionError(f"Invalid score data for game {game_id}")
             
+            logger.debug(f"Scores: {scores}")
             home_score = int(scores[0])  # First row is home team
             away_score = int(scores[1])  # Second row is away team
             
             # Get other stats (lead changes, etc.)
-            other_stats = dataframes[1].iloc[0] if len(dataframes) > 1 and not dataframes[1].empty else {}
+            other_stats = dataframes[7].iloc[0] if len(dataframes) > 1 and not dataframes[7].empty else {}
             game_summary = dataframes[0].iloc[0] if len(dataframes) > 0 and not dataframes[0].empty else {}
             
             # Extract relevant information
@@ -163,10 +168,10 @@ class NBADataCollector:
                 'game_id': game_id,
                 'home_team_score': int(home_score),
                 'away_team_score': int(away_score),
-                'lead_changes': int(other_stats.get('LEAD_CHANGES', 0)),
-                'times_tied': int(other_stats.get('TIMES_TIED', 0)),
-                'game_status': game_summary.get('GAME_STATUS_TEXT', 'Final'),
-                'attendance': game_summary.get('ATTENDANCE', 0)
+                'lead_changes': int(other_stats.get('leadChanges')),
+                'times_tied': int(other_stats.get('timesTied')),
+                'game_status': game_summary.get('gameStatusText'),
+                'attendance': game_summary.get('attendance')
             }
             
             return game_details
@@ -174,6 +179,13 @@ class NBADataCollector:
         except Exception as e:
             raise DataCollectionError(f"Failed to fetch game details for {game_id} : {e}") from e
     
+    def _parse_clock(self,clock_str):
+        match = re.search('(?P<minutes>[0-9]{2})M(?P<seconds>[0-9]{2})', clock_str)
+        minutes = match.group('minutes')
+        seconds = match.group('seconds')
+        return int(minutes)*60+int(seconds)
+
+
     def calculate_competitive_seconds(self, game_id: str) -> float:
         """Calculate seconds when the game was competitive (within 5 points).
         
@@ -187,16 +199,22 @@ class NBADataCollector:
         
         try:
             pbp_data = self._retry_api_call(
-                lambda: winprobabilitypbp.WinProbabilityPBP(game_id=game_id)
+                lambda: playbyplayv3.PlayByPlayV3(game_id=game_id)
             )
-            
-            df = pbp_data.get_data_frames()[0]
+
+            df = pbp_data.play_by_play.get_data_frame()
             
             if df.empty:
                 logger.warning(f"No play-by-play data for game {game_id}")
                 return 0.0
             
             # Sort by time remaining (descending)
+            df['SECONDS_REMAINING'] = df['clock'].apply(self._parse_clock)
+            df['scoreHome'] = pd.to_numeric(df['scoreHome'], errors='coerce')
+            df['scoreAway'] = pd.to_numeric(df['scoreAway'], errors='coerce')
+            df['HOME_SCORE_MARGIN'] = abs(df['scoreHome'] - df['scoreAway'])
+
+            
             df = df.sort_values(by='SECONDS_REMAINING', ascending=False).reset_index(drop=True)
             
             # Calculate time differences
@@ -210,6 +228,7 @@ class NBADataCollector:
             return float(total_seconds) if total_seconds else 0.0
             
         except Exception as e:
+            traceback.print_exception(e)
             raise DataCollectionError(f"Error calculating competitive seconds for {game_id}: {e}") from e
     
     def calculate_rivalry_score(self, home_team_id: int, away_team_id: int, game_date: date) -> float:
@@ -274,9 +293,6 @@ class NBADataCollector:
             )
             
             standings_df = standings.get_data_frames()[0]
-            
-            # Log available columns for debugging
-            logger.debug(f"Standings columns: {list(standings_df.columns)}")
             
             team_standings = {}
             for _, team in standings_df.iterrows():

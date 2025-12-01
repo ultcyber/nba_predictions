@@ -210,7 +210,7 @@ class NBAScheduler:
                 logger.debug(f"Extracted features for game {game_id}")
                 if logger.isEnabledFor(logging.DEBUG):
                     feature_summary = self.feature_engineer.create_feature_summary(features)
-                    logger.debug(f"Features for game {game_id}:\n{feature_summary}")
+                    logger.info(f"Features for game {game_id}:\n{feature_summary}")
                 
                 # Convert to DataFrame for model
                 features_df = self.feature_engineer.features_to_dataframe(features)
