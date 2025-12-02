@@ -6,6 +6,7 @@ import logging
 import sys
 from datetime import date, datetime, timedelta, timezone
 from typing import List, Dict, Any, Optional
+import numpy as np
 
 from .data_collector import NBADataCollector
 from .feature_engineer import FeatureEngineer
@@ -21,7 +22,7 @@ from .utils.exceptions import (
 
 class NBAScheduler:
     """Main scheduler class that orchestrates the prediction workflow."""
-    
+
     def __init__(self):
         """Initialize the scheduler with all components."""
         self.data_collector = None
@@ -38,6 +39,29 @@ class NBAScheduler:
             "games_skipped": 0,
             "errors": []
         }
+
+    @staticmethod
+    def _convert_to_json_serializable(obj: Any) -> Any:
+        """Convert numpy/pandas types to JSON-serializable Python types.
+
+        Args:
+            obj: Object to convert
+
+        Returns:
+            JSON-serializable object
+        """
+        if isinstance(obj, (np.integer, np.int64, np.int32, np.int16, np.int8)):
+            return int(obj)
+        elif isinstance(obj, (np.floating, np.float64, np.float32, np.float16)):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, dict):
+            return {key: NBAScheduler._convert_to_json_serializable(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [NBAScheduler._convert_to_json_serializable(item) for item in obj]
+        else:
+            return obj
     
     def initialize_components(self) -> None:
         """Initialize all components required for prediction.
@@ -622,7 +646,7 @@ class NBAScheduler:
     
     def _save_step_output(self, step: str, data: Any, output_path: str, target_date: date) -> None:
         """Save step output to JSON file.
-        
+
         Args:
             step: Step that produced the data
             data: Data to save
@@ -638,7 +662,7 @@ class NBAScheduler:
                     "total_games": len(data) if isinstance(data, list) else len(data.get('games', data.get('predictions', [])))
                 }
             }
-            
+
             if step == 'collection':
                 output["games"] = data
             elif step == 'features':
@@ -647,12 +671,15 @@ class NBAScheduler:
                 output["predictions"] = data
             else:
                 output["data"] = data
-            
+
+            # Convert numpy/pandas types to JSON-serializable types
+            output = self._convert_to_json_serializable(output)
+
             with open(output_path, 'w') as f:
                 json.dump(output, f, indent=2)
-            
+
             logger.debug(f"Saved {step} output to {output_path}")
-            
+
         except Exception as e:
             logger.error(f"Failed to save {step} output to {output_path}: {e}")
             raise
