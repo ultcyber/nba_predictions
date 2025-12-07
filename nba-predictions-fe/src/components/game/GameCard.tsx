@@ -21,7 +21,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, variant = 'default' }) => {
   const generateNBAGameURL = (awayTeam: string, homeTeam: string, gameId: string) => {
     const awayAbbr = awayTeam.toLowerCase();
     const homeAbbr = homeTeam.toLowerCase();
-    return `https://www.nba.com/game/${awayAbbr}-vs-${homeAbbr}-${gameId}?watchFullGame=true`;
+    return `https://www.nba.com/game/${awayAbbr}-vs-${homeAbbr}-${gameId}`;
   };
 
   if (variant === 'compact') {
