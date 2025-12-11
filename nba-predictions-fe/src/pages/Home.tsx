@@ -21,7 +21,7 @@ const Home: React.FC = () => {
     <div>
       <div className="text-center mb-8">
         <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
-          AI-powered predictions for NBA games
+          AI-powered predictions for NBA games. Know which games are worth watching without seeing the scores.
         </p>
         
         {/* Date Picker */}
