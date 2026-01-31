@@ -205,8 +205,7 @@ class NBADataCollector:
             df = pbp_data.play_by_play.get_data_frame()
             
             if df.empty:
-                logger.warning(f"No play-by-play data for game {game_id}")
-                return 0.0
+                raise DataCollectionError(f"No play-by-play data available for game {game_id}")
             
             # Sort by time remaining (descending)
             df['SECONDS_REMAINING'] = df['clock'].apply(self._parse_clock)
@@ -259,6 +258,10 @@ class NBADataCollector:
             )
             
             # Calculate close games ratio (within 10 points)
+            if not regular_games:
+                raise DataCollectionError(
+                    f"No regular season games found between teams {home_team_id} and {away_team_id} in the last 5 years"
+                )
             close_games = [game for game in regular_games if abs(game) <= 10]
             close_games_ratio = len(close_games) / len(regular_games)
             
@@ -387,8 +390,9 @@ class NBADataCollector:
             return games_df['PLUS_MINUS'].tolist()
             
         except Exception as e:
-            logger.error(f"Error fetching games between teams: {e}")
-            return []
+            raise DataCollectionError(
+                f"Error fetching {season_type} games between teams {team1_id} and {team2_id}: {e}"
+            ) from e
     
     def _get_season_for_date(self, target_date: date) -> str:
         """Get NBA season string for a given date."""
