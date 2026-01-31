@@ -17,3 +17,9 @@ export const getDefaultDate = (): Date => {
 export const formatDateForAPI = (date: Date): string => {
   return date.toISOString().split('T')[0]; // YYYY-MM-DD format
 };
+
+export const addDays = (date: Date, days: number): Date => {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+};
