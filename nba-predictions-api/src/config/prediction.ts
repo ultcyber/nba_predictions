@@ -3,8 +3,8 @@ import { config } from 'dotenv';
 config();
 
 export interface PredictionConfig {
-  goodGameThreshold: number;
-  mediocreGameThreshold: number;
+  highThreshold: number;
+  lowThreshold: number;
 }
 
 const validateThreshold = (threshold: number, defaultValue: number, name: string): number => {
@@ -16,15 +16,15 @@ const validateThreshold = (threshold: number, defaultValue: number, name: string
 };
 
 export const predictionConfig: PredictionConfig = {
-  goodGameThreshold: validateThreshold(parseInt(process.env.GOOD_GAME_THRESHOLD || '80', 10), 80, 'GOOD_GAME_THRESHOLD'),
-  mediocreGameThreshold: validateThreshold(parseInt(process.env.MEDIOCRE_GAME_THRESHOLD || '60', 10), 60, 'MEDIOCRE_GAME_THRESHOLD')
+  highThreshold: validateThreshold(parseInt(process.env.HIGH_THRESHOLD || '80', 10), 80, 'HIGH_THRESHOLD'),
+  lowThreshold: validateThreshold(parseInt(process.env.LOW_THRESHOLD || '60', 10), 60, 'LOW_THRESHOLD')
 };
 
-export const classifyGame = (rating: number): 'good' | 'mediocre' | 'bad' => {
-  if (rating >= predictionConfig.goodGameThreshold) {
+export const classifyGame = (rating: number): 'great' | 'good' | 'bad' => {
+  if (rating >= predictionConfig.highThreshold) {
+    return 'great';
+  } else if (rating >= predictionConfig.lowThreshold) {
     return 'good';
-  } else if (rating >= predictionConfig.mediocreGameThreshold) {
-    return 'mediocre';
   } else {
     return 'bad';
   }

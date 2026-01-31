@@ -1,7 +1,6 @@
 import { database } from '@/config/database';
 import { Game, GameFilters, PaginationParams, PaginatedResponse } from '@/models/types';
 import { ApiError } from '@/middleware/errorHandler';
-import { classifyGame } from '@/config/prediction';
 
 export class GameService {
   
@@ -146,8 +145,7 @@ export class GameService {
         conference: r.away_team_conference as 'East' | 'West'
       },
       prediction: {
-        rating: r.prediction_rating as number,
-        classification: classifyGame(r.prediction_rating as number)
+        rating: r.prediction_rating as number
       }
     };
   }

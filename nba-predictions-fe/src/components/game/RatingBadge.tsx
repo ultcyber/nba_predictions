@@ -6,13 +6,24 @@ interface RatingBadgeProps {
   size?: 'small' | 'medium' | 'large';
 }
 
+const HIGH_THRESHOLD = parseInt(import.meta.env.VITE_HIGH_THRESHOLD || '80', 10);
+const LOW_THRESHOLD = parseInt(import.meta.env.VITE_LOW_THRESHOLD || '60', 10);
+
 const RatingBadge: React.FC<RatingBadgeProps> = ({ prediction, size = 'medium' }) => {
+  const getClassification = (rating: number): 'great' | 'good' | 'bad' => {
+    if (rating >= HIGH_THRESHOLD) return 'great';
+    if (rating >= LOW_THRESHOLD) return 'good';
+    return 'bad';
+  };
+
+  const classification = getClassification(prediction.rating);
+
   const getClassificationColors = (classification: string) => {
     switch (classification) {
+      case 'great':
+        return 'bg-orange-100 text-orange-800 border-orange-200 shadow-orange-200 shadow-md animate-pulse';
       case 'good':
         return 'bg-green-100 text-green-800 border-green-200';
-      case 'mediocre':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'bad':
         return 'bg-red-100 text-red-800 border-red-200';
       default:
@@ -22,15 +33,22 @@ const RatingBadge: React.FC<RatingBadgeProps> = ({ prediction, size = 'medium' }
 
   const getRatingColors = (classification: string) => {
     switch (classification) {
+      case 'great':
+        return 'text-green-600';
       case 'good':
         return 'text-green-600';
-      case 'mediocre':
-        return 'text-yellow-600';
       case 'bad':
         return 'text-red-600';
       default:
         return 'text-gray-600';
     }
+  };
+
+  const getClassificationLabel = (classification: string) => {
+    if (classification === 'great') {
+      return '🔥 GREAT 🔥';
+    }
+    return classification.toUpperCase();
   };
 
   const getSizeClasses = () => {
@@ -55,13 +73,13 @@ const RatingBadge: React.FC<RatingBadgeProps> = ({ prediction, size = 'medium' }
     <div className="text-center space-y-2">
       {/* Classification Badge */}
       <div className="flex justify-center">
-        <span className={`inline-flex items-center rounded-full border font-medium ${getSizeClasses()} ${getClassificationColors(prediction.classification)}`}>
-          {prediction.classification.toUpperCase()}
+        <span className={`inline-flex items-center rounded-full border font-medium ${getSizeClasses()} ${getClassificationColors(classification)}`}>
+          {getClassificationLabel(classification)}
         </span>
       </div>
 
       {/* Rating Display */}
-      <div className={`${getRatingDisplay()} ${getRatingColors(prediction.classification)}`}>
+      <div className={`${getRatingDisplay()} ${getRatingColors(classification)}`}>
         {prediction.rating}<span className="text-gray-500 text-base">/100</span>
       </div>
     </div>
