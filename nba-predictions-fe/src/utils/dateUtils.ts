@@ -1,17 +1,21 @@
 export const getDefaultDate = (): Date => {
   const now = new Date();
-  
-  const pacificTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
-  
-  const cutoffHour = 15; // 3 PM in 24-hour format
-  
-  if (pacificTime.getHours() < cutoffHour) {
-    const yesterday = new Date(pacificTime);
+
+  // Use Eastern Time - NBA's official timezone
+  const easternTime = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
+
+  // Switch to "today" when evening games typically start (6 PM ET)
+  const cutoffHour = 18;
+
+  if (easternTime.getHours() < cutoffHour) {
+    // Before 6 PM ET: show yesterday's completed games
+    const yesterday = new Date(easternTime);
     yesterday.setDate(yesterday.getDate() - 1);
     return yesterday;
   }
-  
-  return pacificTime;
+
+  // After 6 PM ET: show today's games (underway or starting soon)
+  return easternTime;
 };
 
 export const formatDateForAPI = (date: Date): string => {
