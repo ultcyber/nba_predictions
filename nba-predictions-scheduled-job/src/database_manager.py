@@ -59,16 +59,38 @@ class DatabaseManager:
         
         # Check if required tables exist
         required_tables = ['teams', 'games']
-        
+
         for table in required_tables:
             cursor.execute("""
-                SELECT name FROM sqlite_master 
+                SELECT name FROM sqlite_master
                 WHERE type='table' AND name=?
             """, (table,))
-            
+
             if not cursor.fetchone():
                 raise DatabaseError(f"Required table '{table}' not found in database. Please run the API server first.")
-        
+
+        # Ensure team_rivalry_games table exists (create if absent)
+        cursor.execute("""
+            SELECT name FROM sqlite_master
+            WHERE type='table' AND name='team_rivalry_games'
+        """)
+        if not cursor.fetchone():
+            logger.info("Creating team_rivalry_games table for rivalry score caching")
+            conn.executescript("""
+                CREATE TABLE IF NOT EXISTS team_rivalry_games (
+                  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                  team1_id    TEXT NOT NULL,
+                  team2_id    TEXT NOT NULL,
+                  game_date   TEXT NOT NULL,
+                  season_type TEXT NOT NULL CHECK (season_type IN ('Playoffs', 'Regular Season')),
+                  point_diff  INTEGER NOT NULL,
+                  created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+                );
+                CREATE INDEX IF NOT EXISTS idx_rivalry_teams
+                  ON team_rivalry_games(team1_id, team2_id, game_date);
+            """)
+            conn.commit()
+
         # Check if games table has required prediction columns
         cursor.execute("PRAGMA table_info(games)")
         columns = {row[1]: row[2] for row in cursor.fetchall()}
@@ -405,6 +427,119 @@ class DatabaseManager:
             logger.error(f"Error getting database stats: {e}")
             return {"error": str(e)}
     
+    def pair_exists_in_rivalry_cache(self, team1_id: str, team2_id: str) -> bool:
+        """Check if any rivalry games exist in the cache for a team pair.
+
+        Args:
+            team1_id: First team ID (canonical ordering applied internally)
+            team2_id: Second team ID
+
+        Returns:
+            True if at least one row exists for the pair
+        """
+        t1, t2 = tuple(sorted([str(team1_id), str(team2_id)]))
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "SELECT COUNT(*) FROM team_rivalry_games WHERE team1_id=? AND team2_id=?",
+                    (t1, t2)
+                )
+                return cursor.fetchone()[0] > 0
+        except Exception as e:
+            logger.error(f"Error checking rivalry cache for {t1} vs {t2}: {e}")
+            return False
+
+    def get_rivalry_games(
+        self, team1_id: str, team2_id: str, since_date: str
+    ) -> List[Dict[str, Any]]:
+        """Fetch rivalry game rows from the cache within a rolling window.
+
+        Args:
+            team1_id: First team ID (canonical ordering applied internally)
+            team2_id: Second team ID
+            since_date: Earliest game_date to include (YYYY-MM-DD)
+
+        Returns:
+            List of dicts with keys: season_type, point_diff
+        """
+        t1, t2 = tuple(sorted([str(team1_id), str(team2_id)]))
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT season_type, point_diff
+                    FROM team_rivalry_games
+                    WHERE team1_id=? AND team2_id=? AND game_date >= ?
+                """, (t1, t2, since_date))
+                return [dict(row) for row in cursor.fetchall()]
+        except Exception as e:
+            logger.error(f"Error fetching rivalry games for {t1} vs {t2}: {e}")
+            return []
+
+    def save_rivalry_game(
+        self,
+        team1_id: str,
+        team2_id: str,
+        game_date: str,
+        season_type: str,
+        point_diff: int,
+    ) -> None:
+        """Insert a single rivalry game into the cache.
+
+        Args:
+            team1_id: First team ID (canonical ordering applied internally)
+            team2_id: Second team ID
+            game_date: Date in YYYY-MM-DD format
+            season_type: 'Playoffs' or 'Regular Season'
+            point_diff: home_score - away_score (signed integer)
+
+        Raises:
+            DatabaseError: If the insert fails
+        """
+        t1, t2 = tuple(sorted([str(team1_id), str(team2_id)]))
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("""
+                    INSERT INTO team_rivalry_games
+                        (team1_id, team2_id, game_date, season_type, point_diff)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (t1, t2, game_date, season_type, point_diff))
+                conn.commit()
+            logger.debug(f"Saved rivalry game for {t1} vs {t2} on {game_date} ({season_type}, diff={point_diff})")
+        except Exception as e:
+            logger.error(f"Error saving rivalry game for {t1} vs {t2} on {game_date}: {e}")
+            raise DatabaseError("Failed to save rivalry game") from e
+
+    def save_rivalry_games_bulk(
+        self, team1_id: str, team2_id: str, games: List[Dict[str, Any]]
+    ) -> None:
+        """Bulk-insert rivalry games into the cache (used for initial seeding).
+
+        Args:
+            team1_id: First team ID (canonical ordering applied internally)
+            team2_id: Second team ID
+            games: List of dicts with keys: game_date, season_type, point_diff
+
+        Raises:
+            DatabaseError: If the insert fails
+        """
+        t1, t2 = tuple(sorted([str(team1_id), str(team2_id)]))
+        rows = [(t1, t2, g['game_date'], g['season_type'], g['point_diff']) for g in games]
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.executemany("""
+                    INSERT INTO team_rivalry_games
+                        (team1_id, team2_id, game_date, season_type, point_diff)
+                    VALUES (?, ?, ?, ?, ?)
+                """, rows)
+                conn.commit()
+            logger.info(f"Seeded {len(rows)} rivalry games for {t1} vs {t2}")
+        except Exception as e:
+            logger.error(f"Error bulk saving rivalry games for {t1} vs {t2}: {e}")
+            raise DatabaseError("Failed to bulk save rivalry games") from e
+
     def backup_database(self) -> bool:
         """Create a backup of the database.
         

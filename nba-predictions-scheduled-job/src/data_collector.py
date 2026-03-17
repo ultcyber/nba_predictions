@@ -24,12 +24,17 @@ from .utils.exceptions import DataCollectionError
 
 class NBADataCollector:
     """Collects NBA game data from the official API."""
-    
-    def __init__(self):
-        """Initialize data collector."""
+
+    def __init__(self, db_manager=None):
+        """Initialize data collector.
+
+        Args:
+            db_manager: Optional DatabaseManager for rivalry score caching.
+        """
         self.team_names = teams.get_teams()
         self.rate_limit_delay = settings.nba_api_rate_limit_delay
         self.retry_attempts = settings.nba_api_retry_attempts
+        self.db_manager = db_manager
         
     def get_completed_games_for_date(self, target_date: date) -> List[Dict[str, Any]]:
         """Get all completed games for a specific date.
@@ -232,44 +237,58 @@ class NBADataCollector:
     
     def calculate_rivalry_score(self, home_team_id: int, away_team_id: int, game_date: date) -> float:
         """Calculate rivalry score based on recent playoff meetings and close games.
-        
+
+        Uses a DB-first approach: if rivalry data for the team pair already exists in
+        the local cache, the NBA API is skipped entirely.  On the first call for a pair
+        the 5-year history is fetched from the NBA API and stored for future runs.
+
         Args:
             home_team_id: Home team ID
             away_team_id: Away team ID
             game_date: Date of the game
-            
+
         Returns:
             Rivalry score (0.0 to 1.0+)
         """
         logger.debug(f"Calculating rivalry score between teams {home_team_id} and {away_team_id}")
-        
+
         try:
-            # Calculate date 5 years ago
             five_years_ago = date(game_date.year - 5, game_date.month, game_date.day)
-            
-            # Get playoff games between teams in last 5 years
-            playoff_games = self._get_games_between_teams(
-                home_team_id, away_team_id, five_years_ago, game_date, "Playoffs"
-            )
-            
-            # Get regular season games for close game analysis
-            regular_games = self._get_games_between_teams(
-                home_team_id, away_team_id, five_years_ago, game_date, "Regular Season"
-            )
-            
-            # Calculate close games ratio (within 10 points)
-            if not regular_games:
-                raise DataCollectionError(
-                    f"No regular season games found between teams {home_team_id} and {away_team_id} in the last 5 years"
+            five_years_ago_str = five_years_ago.isoformat()
+
+            t1, t2 = tuple(sorted([str(home_team_id), str(away_team_id)]))
+
+            if self.db_manager is not None and self.db_manager.pair_exists_in_rivalry_cache(t1, t2):
+                logger.info(f"Using cached rivalry data for teams {t1} vs {t2}")
+                rows = self.db_manager.get_rivalry_games(t1, t2, five_years_ago_str)
+            else:
+                # Initial seed: fetch full 5-year history from NBA API
+                logger.info(f"No rivalry cache for teams {t1} vs {t2} — seeding from NBA API")
+                playoff_rows = self._get_games_between_teams(
+                    home_team_id, away_team_id, five_years_ago, game_date, "Playoffs"
                 )
-            close_games = [game for game in regular_games if abs(game) <= 10]
-            close_games_ratio = len(close_games) / len(regular_games)
-            
-            # Rivalry score formula: playoff games weight + close games ratio weight
-            rivalry_score = len(playoff_games) * 0.7 + close_games_ratio * 0.3
-            
+                regular_rows = self._get_games_between_teams(
+                    home_team_id, away_team_id, five_years_ago, game_date, "Regular Season"
+                )
+                rows = playoff_rows + regular_rows
+
+                if self.db_manager is not None and rows:
+                    self.db_manager.save_rivalry_games_bulk(t1, t2, rows)
+
+            # Compute score from local rows
+            playoff_games = [r for r in rows if r['season_type'] == 'Playoffs']
+            regular_games = [r for r in rows if r['season_type'] == 'Regular Season']
+
+            total_regular = len(regular_games)
+            if total_regular == 0:
+                close_ratio = 0.0
+            else:
+                close_games = [r for r in regular_games if abs(r['point_diff']) <= 10]
+                close_ratio = len(close_games) / total_regular
+
+            rivalry_score = len(playoff_games) * 0.7 + close_ratio * 0.3
             return float(rivalry_score)
-            
+
         except Exception as e:
             raise DataCollectionError(f"Error calculating rivalry score: {e}") from e
     
@@ -363,14 +382,18 @@ class NBADataCollector:
         return None
     
     def _get_games_between_teams(
-        self, 
-        team1_id: int, 
-        team2_id: int, 
-        start_date: date, 
+        self,
+        team1_id: int,
+        team2_id: int,
+        start_date: date,
         end_date: date,
-        season_type: str
-    ) -> List[int]:
-        """Get games between two teams in a date range."""
+        season_type: str,
+    ) -> List[Dict[str, Any]]:
+        """Get games between two teams in a date range.
+
+        Returns:
+            List of dicts with keys: game_date (YYYY-MM-DD), season_type, point_diff
+        """
         try:
             gamefinder = leaguegamefinder.LeagueGameFinder(
                 player_or_team_abbreviation="T",
@@ -380,15 +403,22 @@ class NBADataCollector:
                 date_from_nullable=self._date_to_usa_format(start_date),
                 date_to_nullable=self._date_to_usa_format(end_date)
             )
-            
+
             self._rate_limit_delay()
             games_df = gamefinder.get_data_frames()[0]
-            
+
             if games_df.empty:
                 return []
-            
-            return games_df['PLUS_MINUS'].tolist()
-            
+
+            rows = []
+            for _, row in games_df.iterrows():
+                rows.append({
+                    'game_date': str(row['GAME_DATE']),
+                    'season_type': season_type,
+                    'point_diff': int(row['PLUS_MINUS']),
+                })
+            return rows
+
         except Exception as e:
             raise DataCollectionError(
                 f"Error fetching {season_type} games between teams {team1_id} and {team2_id}: {e}"

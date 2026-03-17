@@ -71,23 +71,23 @@ class NBAScheduler:
         """
         try:
             logger.info("Initializing NBA prediction components...")
-            
-            # Initialize data collector
+
+            # Initialize database manager first so data collector can use the rivalry cache
+            logger.debug("Initializing database manager")
+            self.database_manager = DatabaseManager()
+
+            # Initialize data collector (passes db_manager for DB-first rivalry scoring)
             logger.debug("Initializing data collector")
-            self.data_collector = NBADataCollector()
-            
+            self.data_collector = NBADataCollector(self.database_manager)
+
             # Initialize feature engineer
             logger.debug("Initializing feature engineer")
             self.feature_engineer = FeatureEngineer(self.data_collector)
-            
+
             # Initialize predictor (loads model)
             logger.debug("Initializing predictor")
             self.predictor = GamePredictor()
-            
-            # Initialize database manager
-            logger.debug("Initializing database manager")
-            self.database_manager = DatabaseManager()
-            
+
             logger.info("All components initialized successfully")
             
         except Exception as e:
@@ -252,6 +252,8 @@ class NBAScheduler:
                 if success:
                     self.stats["games_saved"] += 1
                     logger.info(f"Saved prediction for game {game_id}: {prediction['rating']}/100")
+                    # Append this game to the rivalry cache for future incremental updates
+                    self._save_rivalry_contribution(game)
                 else:
                     logger.warning(f"Failed to save prediction for game {game_id}")
                 
@@ -266,6 +268,34 @@ class NBAScheduler:
                 self.stats["errors"].append(error_msg)
                 continue
     
+    def _save_rivalry_contribution(self, game: Dict[str, Any]) -> None:
+        """Persist the just-played game into the rivalry cache.
+
+        This keeps the local DB up-to-date so future runs never need to hit the
+        NBA API for historical rivalry data for this team pair.
+
+        Args:
+            game: Complete game data dict (must contain date, home/away team IDs and scores)
+        """
+        try:
+            home_team_id = str(game['home_team_id'])
+            away_team_id = str(game['away_team_id'])
+            game_date = game['date']  # YYYY-MM-DD
+
+            # Season type: NBA season_id prefix '4' == Playoffs, everything else == Regular Season
+            season_id = str(game.get('season_id', ''))
+            season_type = 'Playoffs' if season_id.startswith('4') else 'Regular Season'
+
+            # point_diff from home-team perspective (matches PLUS_MINUS convention)
+            point_diff = int(game.get('home_team_score', 0)) - int(game.get('away_team_score', 0))
+
+            self.database_manager.save_rivalry_game(
+                home_team_id, away_team_id, game_date, season_type, point_diff
+            )
+        except Exception as e:
+            # Non-critical: rivalry cache update failure must not abort the main workflow
+            logger.warning(f"Failed to save rivalry contribution for game {game.get('game_id', 'unknown')}: {e}")
+
     def _finalize_stats(self, success: bool) -> Dict[str, Any]:
         """Finalize execution statistics.
         
@@ -486,10 +516,9 @@ class NBAScheduler:
     
     def _step_collection(self, target_date: date) -> List[Dict[str, Any]]:
         """Execute data collection step."""
-        # Initialize data collector
-        self.data_collector = NBADataCollector()
-        
-        # Collect games
+        if not self.database_manager:
+            self.database_manager = DatabaseManager()
+        self.data_collector = NBADataCollector(self.database_manager)
         games = self._collect_games_data(target_date)
         return games
     
@@ -500,6 +529,12 @@ class NBAScheduler:
             self.data_collector = NBADataCollector()
         self.feature_engineer = FeatureEngineer(self.data_collector)
         
+        # Ensure data collector has db_manager for rivalry caching
+        if not self.data_collector:
+            if not self.database_manager:
+                self.database_manager = DatabaseManager()
+            self.data_collector = NBADataCollector(self.database_manager)
+
         # Get games data
         if input_data:
             # Handle both direct list (from previous step) and JSON dict (from file)
@@ -510,7 +545,7 @@ class NBAScheduler:
             logger.info(f"Using {len(games)} games from input data")
         else:
             games = self._collect_games_data(target_date)
-        
+
         # Process games with feature extraction
         processed_games = []
         for game in games:
