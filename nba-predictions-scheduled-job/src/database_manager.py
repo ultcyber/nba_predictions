@@ -84,7 +84,8 @@ class DatabaseManager:
                   game_date   TEXT NOT NULL,
                   season_type TEXT NOT NULL CHECK (season_type IN ('Playoffs', 'Regular Season')),
                   point_diff  INTEGER NOT NULL,
-                  created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+                  created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+                  UNIQUE(team1_id, team2_id, game_date, season_type)
                 );
                 CREATE INDEX IF NOT EXISTS idx_rivalry_teams
                   ON team_rivalry_games(team1_id, team2_id, game_date);
@@ -502,7 +503,7 @@ class DatabaseManager:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 conn.execute("""
-                    INSERT INTO team_rivalry_games
+                    INSERT OR IGNORE INTO team_rivalry_games
                         (team1_id, team2_id, game_date, season_type, point_diff)
                     VALUES (?, ?, ?, ?, ?)
                 """, (t1, t2, game_date, season_type, point_diff))
@@ -530,7 +531,7 @@ class DatabaseManager:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 conn.executemany("""
-                    INSERT INTO team_rivalry_games
+                    INSERT OR IGNORE INTO team_rivalry_games
                         (team1_id, team2_id, game_date, season_type, point_diff)
                     VALUES (?, ?, ?, ?, ?)
                 """, rows)

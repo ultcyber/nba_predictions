@@ -35,7 +35,8 @@ CREATE TABLE IF NOT EXISTS team_rivalry_games (
   game_date   TEXT NOT NULL,  -- YYYY-MM-DD
   season_type TEXT NOT NULL CHECK (season_type IN ('Playoffs', 'Regular Season')),
   point_diff  INTEGER NOT NULL,  -- home_score - away_score (can be negative)
-  created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+  created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(team1_id, team2_id, game_date, season_type)
 );
 
 CREATE INDEX IF NOT EXISTS idx_rivalry_teams
