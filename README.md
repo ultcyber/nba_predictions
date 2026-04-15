@@ -97,6 +97,21 @@ PORT=3001
 NODE_ENV=development
 ```
 
+### Frontend Configuration
+```env
+# API
+VITE_API_BASE_URL=http://localhost:3001
+
+# Rating classification thresholds
+VITE_HIGH_THRESHOLD=80
+VITE_LOW_THRESHOLD=60
+
+# Playoff mode: set both dates (DD/MM/YYYY) to disable predictions for that period.
+# Leave empty to keep predictions available year-round.
+VITE_PLAYOFF_START=
+VITE_PLAYOFF_END=
+```
+
 ### Scheduled Job Configuration
 ```env
 # Data collection

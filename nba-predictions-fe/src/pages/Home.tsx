@@ -2,14 +2,17 @@ import React, { useState } from 'react';
 import { usePredictions } from '../hooks/useApi';
 import DatePicker from '../components/ui/DatePicker';
 import GameList from '../components/game/GameList';
-import { getDefaultDate, formatDateForAPI, addDays } from '../utils/dateUtils';
+import { getDefaultDate, formatDateForAPI, addDays, isPlayoffDate } from '../utils/dateUtils';
 
 const Home: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(getDefaultDate());
 
-  const { data: predictionsData, isLoading, error } = usePredictions({
-    date: formatDateForAPI(selectedDate)
-  });
+  const isPlayoff = isPlayoffDate(selectedDate);
+
+  const { data: predictionsData, isLoading, error } = usePredictions(
+    { date: formatDateForAPI(selectedDate) },
+    !isPlayoff
+  );
 
   const handleDateChange = (date: Date | null) => {
     if (date) {
@@ -80,13 +83,26 @@ const Home: React.FC = () => {
         </div>
       </div>
 
+      {/* Playoff Mode Banner */}
+      {isPlayoff && (
+        <div className="max-w-2xl mx-auto mb-6 px-5 py-4 rounded-xl border border-yellow-300 bg-yellow-50 text-center">
+          <p className="text-lg font-semibold text-yellow-800 mb-1">🏆 NBA Playoffs in Progress</p>
+          <p className="text-sm text-yellow-700">
+            Our model is trained exclusively on regular season data and is not suited for playoff predictions.
+            Predictions are unavailable during the playoff period.
+          </p>
+        </div>
+      )}
+
       {/* Game Predictions */}
-      <GameList 
-        games={predictionsData?.success ? predictionsData.data.data : []}
-        isLoading={isLoading}
-        error={error}
-        selectedDate={formatDateForAPI(selectedDate)}
-      />
+      {!isPlayoff && (
+        <GameList
+          games={predictionsData?.success ? predictionsData.data.data : []}
+          isLoading={isLoading}
+          error={error}
+          selectedDate={formatDateForAPI(selectedDate)}
+        />
+      )}
     </div>
   );
 };

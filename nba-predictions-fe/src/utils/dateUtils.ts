@@ -27,3 +27,25 @@ export const addDays = (date: Date, days: number): Date => {
   result.setDate(result.getDate() + days);
   return result;
 };
+
+// Parse a DD/MM/YYYY string into a Date (midnight local time), or null if invalid
+const parseDMY = (value: string): Date | null => {
+  const parts = value.split('/');
+  if (parts.length !== 3) return null;
+  const [day, month, year] = parts.map(Number);
+  if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+  return new Date(year, month - 1, day);
+};
+
+export const isPlayoffDate = (date: Date): boolean => {
+  const startStr = import.meta.env.VITE_PLAYOFF_START;
+  const endStr = import.meta.env.VITE_PLAYOFF_END;
+  if (!startStr || !endStr) return false;
+
+  const start = parseDMY(startStr);
+  const end = parseDMY(endStr);
+  if (!start || !end) return false;
+
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  return d >= start && d <= end;
+};

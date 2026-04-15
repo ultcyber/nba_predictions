@@ -22,11 +22,11 @@ export const useHealth = () => {
 };
 
 // Predictions list hook
-export const usePredictions = (params?: PredictionsQueryParams) => {
+export const usePredictions = (params?: PredictionsQueryParams, enabled = true) => {
   return useQuery({
     queryKey: queryKeys.predictions(params),
     queryFn: () => apiService.getPredictions(params),
-    enabled: true,
+    enabled,
   });
 };
 
