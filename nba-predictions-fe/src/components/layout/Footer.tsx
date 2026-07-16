@@ -9,11 +9,16 @@ const Footer: React.FC = () => {
     <footer className="bg-gray-800 text-white mt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="text-center space-y-3">
+          <div className="flex justify-center">
+            <a href="https://www.buymeacoffee.com/ultcyber" target="_blank" rel="noopener noreferrer">
+              <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style={{ height: '60px', width: 'auto' }} />
+            </a>
+          </div>
           <p className="text-gray-400 text-xs leading-relaxed max-w-4xl mx-auto font-light">
             The National Basketball Association ("NBA") and the names of the NBA teams are trademarks that are property of NBA Properties, Inc. and the member teams of the NBA. These trademark holders are not affiliated with, nor do they sponsor or endorse this site.
           </p>
           <div className="text-sm flex items-center justify-center gap-4">
-            <a 
+            <a
               href="https://github.com/ultcyber/nba_predictions"
               target="_blank"
               rel="noopener noreferrer"
