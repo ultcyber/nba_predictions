@@ -34,7 +34,13 @@ const Home: React.FC = () => {
         <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
           AI-powered predictions for NBA games. Know which games are worth watching without seeing the scores.
         </p>
-        
+
+        <div className="flex justify-center mb-6 sm:hidden">
+          <a href="https://www.buymeacoffee.com/ultcyber" target="_blank" rel="noopener noreferrer">
+            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style={{ height: '40px', width: 'auto' }} />
+          </a>
+        </div>
+
         {/* Date Picker */}
         <div className="max-w-md mx-auto mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
